@@ -69,10 +69,15 @@ return [
     'admin.report.show' => ['file' => 'admin.report.show.php', 'roles' => ['admin']],
     'admin.audit'       => ['file' => 'admin.audit.php',       'roles' => ['admin']],
     'admin.settings'    => ['file' => 'admin.settings.php',    'roles' => ['admin']],
+    'admin.its'         => ['file' => 'admin.its.php',         'roles' => ['admin']],
 
     // -------------------------------------------------------------------------
     // System endpoints
     // -------------------------------------------------------------------------
     'api.notifications' => ['file' => 'api.notifications.php', 'roles' => ['user', 'staff', 'admin']],
     'serve_upload'      => ['file' => 'serve_upload.php',      'roles' => ['user', 'staff', 'admin']],
+
+    // Mock ITS endpoint — public because external APIs authenticate via
+    // header, not session. The handler validates the configured token.
+    'api.its_mock'      => ['file' => 'api.its_mock.php',      'public' => true],
 ];

@@ -153,9 +153,10 @@ function sidebar_items(string $role): array
     // ----- Section 3: admin items -----
     if ($role === 'admin') {
         $items[] = ['section' => true, 'label' => 'Admin'];
-        $items[] = ['label' => 'Reports',   'href' => url('/index.php?p=admin.reports'),  'active_tokens' => ['admin.reports', 'admin.report.show']];
-        $items[] = ['label' => 'Audit Log', 'href' => url('/index.php?p=admin.audit'),    'active_tokens' => ['admin.audit']];
-        $items[] = ['label' => 'Settings',  'href' => url('/index.php?p=admin.settings'), 'active_tokens' => ['admin.settings']];
+        $items[] = ['label' => 'Reports',         'href' => url('/index.php?p=admin.reports'),  'active_tokens' => ['admin.reports', 'admin.report.show']];
+        $items[] = ['label' => 'Audit Log',       'href' => url('/index.php?p=admin.audit'),    'active_tokens' => ['admin.audit']];
+        $items[] = ['label' => 'ITS Integration', 'href' => url('/index.php?p=admin.its'),      'active_tokens' => ['admin.its']];
+        $items[] = ['label' => 'Settings',        'href' => url('/index.php?p=admin.settings'), 'active_tokens' => ['admin.settings']];
     }
 
     return $items;

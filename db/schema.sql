@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS attachments;
 DROP TABLE IF EXISTS found_reports;
 DROP TABLE IF EXISTS lost_reports;
 DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS its_users;
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS storage_locations;
 DROP TABLE IF EXISTS accounts;
@@ -331,4 +332,29 @@ CREATE TABLE reports (
   KEY idx_reports_type      (report_type),
   CONSTRAINT fk_reports_generator
     FOREIGN KEY (generated_by_account_id) REFERENCES accounts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- its_users — directory/cache of users pulled from the external ITS system.
+-- This is NOT the auth source — accounts remains the login authority.
+-- Admins use this table to audit ITS data and, optionally, to provision
+-- matching accounts. Records are upserted on each sync keyed by its_id.
+-- -----------------------------------------------------------------------------
+CREATE TABLE its_users (
+  id                       INT UNSIGNED       NOT NULL AUTO_INCREMENT,
+  its_id                   VARCHAR(50)        NOT NULL,         -- external ITS identifier
+  full_name                VARCHAR(150)       NOT NULL,
+  email                    VARCHAR(255)       NULL,
+  role                     ENUM('student','staff','faculty') NOT NULL,
+  status                   ENUM('active','inactive') NOT NULL DEFAULT 'active',
+  raw_json                 JSON               NULL,             -- last seen API payload
+  last_synced_at           DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at               DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at               DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                                       ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_its_id (its_id),
+  KEY idx_its_role     (role, status),
+  KEY idx_its_email    (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

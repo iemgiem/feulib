@@ -41,4 +41,29 @@ return [
         'allowed_mimes'  => ['image/jpeg', 'image/png', 'image/webp'],
         'storage_path'   => __DIR__ . '/assets/uploads',             // absolute path on disk
     ],
+
+    // -------------------------------------------------------------------------
+    // ITS (Integrated Tertiary System) — external user directory.
+    // The Admin → ITS Integration page and db/sync_its.php pull authoritative
+    // student / staff / faculty records from this endpoint into the local
+    // its_users table. Defaults point at the in-project mock for development.
+    // -------------------------------------------------------------------------
+    'its' => [
+        // Auth: 'bearer' sends `Authorization: Bearer <auth_value>`.
+        //       'api_key' sends `<api_key_header>: <auth_value>`.
+        'auth_mode'        => 'bearer',
+        'auth_value'       => 'dev-token-change-me-before-production',
+        'api_key_header'   => 'X-API-Key',
+
+        // Network
+        'timeout_seconds'  => 10,
+        'verify_ssl'       => true,
+
+        // Endpoints — full URLs so the mock and real ITS can coexist trivially.
+        // The mock validates the same auth header the real ITS would.
+        'endpoints' => [
+            'students' => 'http://localhost/feulib/index.php?p=api.its_mock&type=student',
+            'staff'    => 'http://localhost/feulib/index.php?p=api.its_mock&type=staff',
+        ],
+    ],
 ];

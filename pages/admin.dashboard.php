@@ -127,6 +127,10 @@ page_header('Administration', '<a class="btn btn-ghost" href="' . e(url('/index.
           Audit Log
         </a>
         <a class="btn btn-ghost" style="justify-content: flex-start; width: 100%;"
+           href="<?= e(url('/index.php?p=admin.its')) ?>">
+          ITS Integration
+        </a>
+        <a class="btn btn-ghost" style="justify-content: flex-start; width: 100%;"
            href="<?= e(url('/index.php?p=admin.settings')) ?>">
           Settings
         </a>

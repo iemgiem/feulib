@@ -118,18 +118,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     q("UPDATE found_reports SET status = 'matched', updated_at = NOW() WHERE id = ? AND status = 'open'",
                         [(int) $match['found_report_id']]);
 
-                    $existing_claim = q_value(
-                        'SELECT id FROM claim_tickets WHERE match_id = ? LIMIT 1',
-                        [(int) $match['id']]
+                    // INSERT IGNORE lets the DB-level UNIQUE KEY uq_claim_match(match_id)
+                    // absorb a concurrent second approve without throwing. We use a
+                    // placeholder ref_number (updated below) because the real value
+                    // requires the auto-increment id.
+                    q(
+                        "INSERT IGNORE INTO claim_tickets
+                             (match_id, claimant_account_id, ref_number, status, created_at, updated_at)
+                          VALUES (?, ?, '', ?, NOW(), NOW())",
+                        [(int) $match['id'], (int) $match['lost_reporter_id'], 'pending_user_action']
                     );
-                    if (!$existing_claim) {
-                        q(
-                            'INSERT INTO claim_tickets
-                                (match_id, claimant_account_id, status, created_at, updated_at)
-                             VALUES (?, ?, ?, NOW(), NOW())',
-                            [(int) $match['id'], (int) $match['lost_reporter_id'], 'pending_user_action']
-                        );
-                        $claim_id  = db_last_id();
+                    $claim_id = db_last_id();
+
+                    if ($claim_id) {
+                        // This request won the race — set the real ref_number, audit, notify.
                         $claim_ref = make_ref_number('claim', $claim_id);
                         q('UPDATE claim_tickets SET ref_number = ? WHERE id = ?', [$claim_ref, $claim_id]);
                         audit_log('claim.create', 'claim_ticket', $claim_id, [
@@ -150,6 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ]
                         );
                     }
+                    // If $claim_id === 0, a concurrent approve already created the claim;
+                    // the unique constraint silently ignored this insert — no action needed.
                 }
             });
 

@@ -99,6 +99,7 @@ function layout_close(): void
   </div>
   <script src="<?= e(asset('js/validate.js')) ?>" defer></script>
   <script src="<?= e(asset('js/photo-upload.js')) ?>" defer></script>
+  <script src="<?= e(asset('js/notifications.js')) ?>" defer></script>
 </body>
 </html>
 <?php

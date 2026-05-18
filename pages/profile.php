@@ -8,8 +8,12 @@ declare(strict_types=1);
  * POST ?p=profile         Update name and/or password.
  */
 
-$user    = current_user();
-$user_id = (int) $user['id'];
+$session_user = current_user();
+$user_id      = (int) $session_user['id'];
+
+// current_user() omits password_hash; fetch the full row so the change-password
+// flow can verify the current password.
+$user = q_one('SELECT * FROM accounts WHERE id = ?', [$user_id]) ?? $session_user;
 
 $errors = [];
 $old    = [];

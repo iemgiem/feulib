@@ -115,10 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_verifiable) {
                 &$sig_id, &$selfie_id
             ) {
                 // Store signature attachment
-                $sig_id = upload_store($sig_file, 'claim_ticket', $claim_id, 'signature')['id'];
+                $sig_id = upload_store($sig_file, 'claim_ticket', $claim_id, 'signature');
 
                 // Store selfie attachment
-                $selfie_id = upload_store($selfie_file, 'claim_ticket', $claim_id, 'selfie')['id'];
+                $selfie_id = upload_store($selfie_file, 'claim_ticket', $claim_id, 'selfie');
 
                 // Create release log
                 q(

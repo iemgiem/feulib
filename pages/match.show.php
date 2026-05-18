@@ -209,7 +209,7 @@ if (!empty($match['reviewed_by_account_id'])) {
 // ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
-layout_open('Match ' . $match['ref_number'] ?? (string) $id);
+layout_open('Match #' . $id);
 
 $success = flash_get('success');
 if ($success) {

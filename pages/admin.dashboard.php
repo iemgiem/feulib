@@ -13,12 +13,15 @@ $total_lost    = (int) (q_value("SELECT COUNT(*) FROM lost_reports") ?? 0);
 $total_found   = (int) (q_value("SELECT COUNT(*) FROM found_reports") ?? 0);
 $total_released = (int) (q_value("SELECT COUNT(*) FROM claim_tickets WHERE status = 'released'") ?? 0);
 $total_open    = (int) (q_value("SELECT COUNT(*) FROM found_reports WHERE status IN ('open','matched')") ?? 0);
-$expiring_soon = (int) (q_value(
+
+$holding_period = (int) (q_value("SELECT value FROM settings WHERE key_name = 'holding_period_days'") ?? 30);
+if ($holding_period < 1) $holding_period = 30;
+$warn_threshold = max(1, $holding_period - 7);
+$expiring_soon  = (int) (q_value(
     "SELECT COUNT(*) FROM found_reports
       WHERE status IN ('open','matched')
-        AND date_found <= CURDATE() - INTERVAL (
-              COALESCE((SELECT value FROM settings WHERE key_name = 'holding_period_days'), 30) - 7
-            ) DAY"
+        AND date_found <= (CURDATE() - INTERVAL ? DAY)",
+    [$warn_threshold]
 ) ?? 0);
 $pending_matches = (int) (q_value("SELECT COUNT(*) FROM matches WHERE status IN ('pending','needs_info')") ?? 0);
 
@@ -67,7 +70,7 @@ page_header('Administration', '<a class="btn btn-ghost" href="' . e(url('/index.
     <div class="stat-card-value"><?= $total_open ?></div>
     <div class="stat-card-label">In Storage</div>
   </div>
-  <div class="stat-card<?= $expiring_soon > 0 ? ' stat-card-warn' : '' ?>">
+  <div class="stat-card">
     <div class="stat-card-value"><?= $expiring_soon ?></div>
     <div class="stat-card-label">Expiring Soon</div>
   </div>

@@ -144,36 +144,36 @@ page_header('Audit Log');
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($entries as $e): ?>
+          <?php foreach ($entries as $entry): ?>
             <tr>
-              <td class="col-narrow text-sm text-muted"><?= (int) $e['id'] ?></td>
+              <td class="col-narrow text-sm text-muted"><?= (int) $entry['id'] ?></td>
               <td>
                 <span class="text-sm" style="font-family: var(--font-family-mono);">
-                  <?= htmlspecialchars((string) $e['action'], ENT_QUOTES, 'UTF-8') ?>
+                  <?= e((string) $entry['action']) ?>
                 </span>
               </td>
               <td>
                 <span class="text-sm">
-                  <?= htmlspecialchars((string) $e['target_type'], ENT_QUOTES, 'UTF-8') ?>
-                  #<?= (int) $e['target_id'] ?>
+                  <?= e((string) $entry['target_type']) ?>
+                  #<?= (int) $entry['target_id'] ?>
                 </span>
-                <?php if (!empty($e['diff_json'])): ?>
+                <?php if (!empty($entry['diff_json'])): ?>
                   <details class="text-sm text-muted" style="margin-top: var(--space-1);">
                     <summary>diff</summary>
-                    <pre style="white-space: pre-wrap; font-size: 0.75em; max-width: 320px;"><?= htmlspecialchars((string) $e['diff_json'], ENT_QUOTES, 'UTF-8') ?></pre>
+                    <pre style="white-space: pre-wrap; font-size: 0.75em; max-width: 320px;"><?= e((string) $entry['diff_json']) ?></pre>
                   </details>
                 <?php endif; ?>
               </td>
               <td>
-                <?php if (!empty($e['actor_name'])): ?>
-                  <?= htmlspecialchars((string) $e['actor_name'], ENT_QUOTES, 'UTF-8') ?>
-                  <div class="text-sm text-muted"><?= htmlspecialchars((string) $e['actor_email'], ENT_QUOTES, 'UTF-8') ?></div>
+                <?php if (!empty($entry['actor_name'])): ?>
+                  <?= e((string) $entry['actor_name']) ?>
+                  <div class="text-sm text-muted"><?= e((string) $entry['actor_email']) ?></div>
                 <?php else: ?>
                   <span class="text-muted">system</span>
                 <?php endif; ?>
               </td>
-              <td class="col-narrow text-sm text-muted"><?= htmlspecialchars((string) ($e['ip_address'] ?? '—'), ENT_QUOTES, 'UTF-8') ?></td>
-              <td class="col-narrow text-sm text-muted"><?= htmlspecialchars(time_ago((string) $e['created_at']), ENT_QUOTES, 'UTF-8') ?></td>
+              <td class="col-narrow text-sm text-muted"><?= e((string) ($entry['ip_address'] ?? '—')) ?></td>
+              <td class="col-narrow text-sm text-muted"><?= e(time_ago((string) $entry['created_at'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

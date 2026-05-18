@@ -1,0 +1,28 @@
+# Block all direct HTTP access to uploaded files. Delivery is mediated by
+# pages/serve_upload.php which enforces per-attachment permission checks.
+#
+# Apache 2.4 syntax:
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2 fallback:
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+
+# Defence in depth: also disable PHP execution in this tree, in case the
+# .htaccess that denies access ever gets misconfigured.
+<FilesMatch "\.(php|phtml|phar|inc)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Some shared hosts auto-enable directory listing. Turn it off.
+Options -Indexes -ExecCGI

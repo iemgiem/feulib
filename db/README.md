@@ -11,7 +11,7 @@ Management System. It targets the MySQL / MariaDB build that ships with
 | `schema.sql` | All table definitions, indexes, and foreign keys. Drops tables on import — re-running it nukes the database. |
 | `seed.sql` | Demo data: 1 admin, 2 staff, 5 students/faculty, 3 storage locations, 4 lost reports, 3 found items, 1 pending match, sample audit log entries. |
 | `hash_passwords.php` | CLI utility that prints a bcrypt hash for a given password. Run when you need to regenerate the seed password or change a specific account's password directly. |
-| `expire_items.php` | (Added in Task 22) CLI script that marks items past the holding period as `EXPIRED`. Scheduled via Windows Task Scheduler at noon Mon–Sat. |
+| `expire_items.php` | CLI script that marks items past the holding period as `EXPIRED`. Scheduled via Windows Task Scheduler at noon Mon–Sat. Supports `--dry` flag. |
 
 ## First-time setup
 

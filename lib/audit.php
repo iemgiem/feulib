@@ -25,8 +25,11 @@ declare(strict_types=1);
  */
 function audit_log(string $action, string $target_type, int $target_id, ?array $diff = null): void
 {
-    $actor_id = $_SESSION['user_id'] ?? null;
-    $ip       = $_SERVER['REMOTE_ADDR'] ?? null;
+    // CLI scripts (e.g. db/expire_items.php) run without a session and without
+    // a REMOTE_ADDR — both lookups must be tolerant of missing data so the
+    // system can audit its own actions.
+    $actor_id  = (session_status() === PHP_SESSION_ACTIVE) ? ($_SESSION['user_id'] ?? null) : null;
+    $ip        = $_SERVER['REMOTE_ADDR'] ?? null;
     $diff_json = $diff !== null ? json_encode($diff, JSON_UNESCAPED_UNICODE) : null;
 
     q(

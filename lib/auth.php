@@ -24,6 +24,12 @@ declare(strict_types=1);
  */
 function session_boot(): void
 {
+    if (PHP_SAPI === 'cli') {
+        // No HTTP context — leave $_SESSION uninitialised. Audit_log() and
+        // current_user() already handle the missing session gracefully, which
+        // is exactly what CLI tools like db/expire_items.php depend on.
+        return;
+    }
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }

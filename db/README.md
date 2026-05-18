@@ -12,6 +12,8 @@ Management System. It targets the MySQL / MariaDB build that ships with
 | `seed.sql` | Demo data: 1 admin, 2 staff, 5 students/faculty, 3 storage locations, 4 lost reports, 3 found items, 1 pending match, sample audit log entries. |
 | `hash_passwords.php` | CLI utility that prints a bcrypt hash for a given password. Run when you need to regenerate the seed password or change a specific account's password directly. |
 | `expire_items.php` | CLI script that marks items past the holding period as `EXPIRED`. Scheduled via Windows Task Scheduler at noon Mon–Sat. Supports `--dry` flag. |
+| `sync_its.php` | CLI script that runs `its_sync()` — fetches the ITS roster and upserts into `its_users`. Schedule nightly via Windows Task Scheduler. |
+| `migrations/` | One-off SQL files to apply against an existing database when a feature lands after the initial import. See `migrations/2026_its_users.sql` for the format. |
 
 ## First-time setup
 
@@ -59,8 +61,11 @@ return [
 
 ### 6. Verify
 
-Open phpMyAdmin → `lfms` database → confirm all 12 tables exist and
-the `accounts` table has 8 rows.
+Open phpMyAdmin → `lfms` database → confirm all 13 tables exist
+(`accounts`, `storage_locations`, `settings`, `lost_reports`,
+`found_reports`, `attachments`, `matches`, `claim_tickets`,
+`release_logs`, `notifications`, `audit_logs`, `reports`, `its_users`)
+and the `accounts` table has 8 rows.
 
 ## Demo accounts
 
@@ -104,8 +109,9 @@ them, so running it again is safe and gives you a clean slate.
   names with diacritics and emoji-in-descriptions all work.
 - **Engine**: InnoDB for foreign keys and transactions.
 - **Active sessions** are handled by PHP's built-in session mechanism
-  (filesystem-backed). There is no `auth_sessions` table — login
-  events are recorded in `audit_logs` (`action = 'auth.login'`).
+  (filesystem-backed). There is no `auth_sessions` table — login and
+  logout events are recorded in `audit_logs` (`action = 'auth.login'`
+  and `'auth.logout'`).
 - **Reference numbers** (`LFMS-2026-NNNNN`) are generated in PHP on
   insert; the auto-increment `id` provides the sequence.
 - **`release_logs` is immutable** — no `updated_at` column. Once a

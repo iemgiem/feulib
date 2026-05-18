@@ -15,6 +15,8 @@ A web-based system for FEU library staff and students to report lost items, log 
 - **Audit log** — every state-changing action is appended to `audit_logs` with actor, timestamp, IP address, and a field-level diff.
 - **Role-based access** — three roles (user / staff / admin) enforced at the routing layer.
 - **Live notification bell** — a JS polling endpoint keeps the unread badge current without page reloads.
+- **ITS integration** — pulls the authoritative student/staff/faculty roster from FEU's Integrated Tertiary System (or the bundled mock endpoint) into a local `its_users` cache; admins can trigger a sync from the UI and a nightly CLI script runs unattended.
+- **Admin reports + CSV export** — admins generate Operational Summary / Match Effectiveness / User Activity reports for any date range, preview on-screen, and export to UTF-8 BOM CSV.
 
 ---
 
@@ -137,8 +139,9 @@ feulib/
 │   ├── matching.php        # generate_candidates_for_lost/found() scoring algorithm
 │   ├── matching_test.php   # Unit tests for the matching algorithm
 │   ├── validate.php        # Server-side validation rules (mirrored in assets/js/validate.js)
-│   ├── sanitize.php        # HTML sanitization helpers
-│   └── view.php            # e(), url(), asset(), status_badge(), render_pagination(), ...
+│   ├── sanitize.php        # e() HTML escape, clean() strip-tags
+│   ├── its.php             # ITS (Integrated Tertiary System) integration — fetch + sync
+│   └── view.php            # url(), asset(), status_badge(), make_ref_number(), table_state(), sort_link(), render_pagination()
 │
 ├── pages/                  # Page controllers, one per route token
 │   ├── login.php / register.php / forgot.php / logout.php
@@ -153,7 +156,9 @@ feulib/
 │   ├── staff.claims.php / release.php
 │   ├── admin.dashboard.php / admin.audit.php / admin.settings.php
 │   ├── admin.reports.php / admin.report.show.php
+│   ├── admin.its.php           # ITS roster viewer + manual sync trigger
 │   ├── api.notifications.php   # JSON polling endpoint
+│   ├── api.its_mock.php        # Mock ITS API for local dev (token-auth)
 │   └── serve_upload.php        # Authenticated file delivery
 │
 ├── partials/               # Shared HTML fragments
@@ -172,7 +177,9 @@ feulib/
     ├── schema.sql           # Full table definitions (idempotent — drops on re-run)
     ├── seed.sql             # Demo data
     ├── expire_items.php     # Daily CLI expiry job
+    ├── sync_its.php         # Nightly CLI ITS roster sync
     ├── hash_passwords.php   # bcrypt hash utility
+    ├── migrations/          # One-off SQL files to apply to existing databases
     └── README.md            # Database setup details
 ```
 
@@ -201,7 +208,25 @@ php db/expire_items.php --dry
 php db/expire_items.php
 ```
 
-Schedule via Windows Task Scheduler at noon, Mon–Sat — see `db/expire_items.php` for the `schtasks` command. The holding period (default: 30 days) is configurable from **Admin → Settings**.
+Schedule via Windows Task Scheduler at noon, Mon–Sat — see `db/expire_items.php` for the `schtasks` command. The holding period (default: 365 days) is configurable from **Admin → Settings**.
+
+---
+
+## ITS integration
+
+The system can pull a roster of authoritative student / staff / faculty records from FEU's Integrated Tertiary System (ITS) and cache them locally in `its_users`. The cache feeds the admin directory page (`?p=admin.its`) and is the source of identity used for ID verification at release time.
+
+Configure the endpoint, auth mode, and credentials under the `its` key in `config.php` (see `config.example.php`). A bundled mock — `?p=api.its_mock` — serves a static JSON payload for local development; point `its.endpoints.*` at it when working without a real ITS server.
+
+```sh
+# One-time manual sync (admin UI button does the same thing):
+php db/sync_its.php
+
+# Schedule nightly at 02:00:
+schtasks /Create /SC DAILY /TN "LFMS Sync ITS" /TR "php C:\xampp\htdocs\feulib\db\sync_its.php" /ST 02:00
+```
+
+The local `its_users` table is populated by the first sync. If you imported `db/schema.sql` from scratch the table already exists; if you upgraded an older database, apply `db/migrations/2026_its_users.sql` first.
 
 ---
 

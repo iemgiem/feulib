@@ -135,6 +135,28 @@ table {
   border: 0;
 }
 
+/* -- Skip-to-content link (visible only when focused) ----------------------- */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-md) 0;
+  transform: translateY(-100%);
+  transition: transform var(--duration-fast) var(--easing-default);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  color: var(--color-text-inverse);
+}
+
 /* -- Reduced-motion preference --------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *,

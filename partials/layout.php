@@ -36,12 +36,13 @@ function layout_open(string $page_title): void
   <link rel="stylesheet" href="<?= e(asset('css/components.css')) ?>">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="app-shell">
 <?php
     require __DIR__ . '/header.php';
     require __DIR__ . '/sidebar.php';
     ?>
-    <main class="app-main" role="main">
+    <main class="app-main" role="main" id="main-content" tabindex="-1">
       <div class="app-content">
 <?php
 }

@@ -14,8 +14,8 @@ $total_found   = (int) (q_value("SELECT COUNT(*) FROM found_reports") ?? 0);
 $total_released = (int) (q_value("SELECT COUNT(*) FROM claim_tickets WHERE status = 'released'") ?? 0);
 $total_open    = (int) (q_value("SELECT COUNT(*) FROM found_reports WHERE status IN ('open','matched')") ?? 0);
 
-$holding_period = (int) (q_value("SELECT value FROM settings WHERE key_name = 'holding_period_days'") ?? 30);
-if ($holding_period < 1) $holding_period = 30;
+$holding_period = (int) (q_value("SELECT value FROM settings WHERE key_name = 'holding_period_days'") ?? 365);
+if ($holding_period < 1) $holding_period = 365;
 $warn_threshold = max(1, $holding_period - 7);
 $expiring_soon  = (int) (q_value(
     "SELECT COUNT(*) FROM found_reports

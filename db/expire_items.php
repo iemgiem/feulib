@@ -14,7 +14,7 @@ declare(strict_types=1);
  *   php db/expire_items.php --dry    # show what would change without writing
  *
  * Behaviour:
- *   - Reads holding_period_days from the settings table (default 30).
+ *   - Reads holding_period_days from the settings table (default 365).
  *   - Selects every found_report with status='open' AND
  *     date_found <= CURDATE() - INTERVAL <holding_period_days> DAY.
  *   - Items in status 'matched' are NOT expired automatically — a match is
@@ -36,12 +36,12 @@ require_once __DIR__ . '/../lib/bootstrap.php';
 
 $dry_run = in_array('--dry', $argv ?? [], true);
 
-// Resolve holding-period setting (fallback: 30 days).
+// Resolve holding-period setting (fallback: 365 days = 1 year).
 $holding_period = (int) (q_value(
     "SELECT value FROM settings WHERE key_name = 'holding_period_days' LIMIT 1"
-) ?? 30);
+) ?? 365);
 if ($holding_period < 1) {
-    $holding_period = 30;
+    $holding_period = 365;
 }
 
 fwrite(STDOUT, sprintf(

@@ -141,9 +141,22 @@ audit_log('match.approve',        'match',         $match_id, [
 // [ 'field' => ['old_value', 'new_value'], … ]
 ```
 
-Action strings follow `<resource>.<verb>` convention. Existing verbs:
-`create`, `update`, `delete`, `expire`, `approve`, `reject`, `needs_info`,
-`system_reject_expired`, `login`, `logout`, `update_name`, `change_password`.
+Action strings follow `<resource>.<verb>` convention. Existing actions in the
+codebase:
+
+- `account.register`, `account.update_name`, `account.change_password`
+- `attachment.create`, `attachment.delete`
+- `auth.login`, `auth.logout`
+- `claim.create`, `claim.submit`, `claim.release`
+- `found_report.create`, `found_report.update`, `found_report.expire`
+- `its.sync`, `its.sync_failed`
+- `lost_report.create`, `lost_report.update`
+- `match.generate`, `match.approve`, `match.reject`, `match.needs_info`, `match.system_reject_expired`
+- `settings.update_match_weights`, `settings.update_holding_period`
+
+When adding a new action, follow the same `<resource>.<verb>` shape and grep
+this list before inventing a verb that already exists in a slightly different
+form.
 
 In CLI scripts (e.g. `db/expire_items.php`), `audit_log` is called with no authenticated session. Verify that the implementation handles a null actor gracefully (writes NULL to `actor_account_id`).
 
@@ -198,10 +211,10 @@ Key/value store. Use `INSERT … ON DUPLICATE KEY UPDATE` for upserts:
 q(
     "INSERT INTO settings (key_name, value) VALUES (?, ?)
        ON DUPLICATE KEY UPDATE value = VALUES(value)",
-    ['holding_period_days', '30']
+    ['holding_period_days', '365']
 );
 
-$days = (int) (q_value("SELECT value FROM settings WHERE key_name = 'holding_period_days'") ?? 30);
+$days = (int) (q_value("SELECT value FROM settings WHERE key_name = 'holding_period_days'") ?? 365);
 ```
 
 ---
@@ -259,3 +272,66 @@ q(
 ```
 
 `link_url` values are relative paths (no domain). The `api.notifications.php` endpoint converts them to absolute URLs via `url()` before returning JSON. `notifications.php` wraps them the same way when rendering the page list.
+
+---
+
+## CSV export (`lib/export.php`)
+
+Hand-rolled, zero-dependency. Use for any admin export that should download as a spreadsheet-friendly CSV.
+
+```php
+csv_send('lfms-operational-2026-05.csv', function ($h) {
+    csv_row($h, ['FEU Library — Lost & Found Management System']);
+    csv_row($h, ['Generated at', date('Y-m-d H:i:s')]);
+    csv_row($h, []);
+
+    csv_section($h, 'Totals',
+        ['Metric', 'Count'],
+        [['Lost reports', 42], ['Found items', 31]]
+    );
+});
+// csv_send sets the headers, writes a UTF-8 BOM (Excel opens accented names
+// correctly), invokes the writer with an open php://output handle, and exits.
+// Call it BEFORE any HTML output — the page must not have started rendering.
+```
+
+Reach for `csv_section` when an export contains multiple labelled tables; reach for raw `csv_row` when you only need a single rectangular dataset.
+
+---
+
+## ITS integration (`lib/its.php`)
+
+The Integrated Tertiary System (ITS) is FEU's authoritative source for student / staff / faculty records. LFMS fetches that roster over HTTP and caches it locally in `its_users`. Authentication for LFMS itself still uses the `accounts` table — ITS is for ID verification at the counter, not login.
+
+Public surface:
+
+```php
+its_fetch_students(): array        // Live HTTP call. Throws on failure.
+its_fetch_staff():    array        // Live HTTP call. Throws on failure.
+its_sync():           array        // Fetch both, upsert, return summary.
+its_get_by_id($its_id):         ?array  // Local DB lookup.
+its_get_student_by_id($its_id): ?array
+its_get_staff_by_id($its_id):   ?array
+its_last_sync_at():             ?string // MAX(last_synced_at).
+```
+
+`its_sync()` is transactional, idempotent, and soft-deactivates rows the API no longer returns. It writes one `its.sync` audit row on success or `its.sync_failed` on error — the admin UI surfaces the same summary.
+
+**Config** (under the `its` key in `config.php`):
+
+- `endpoints.students`, `endpoints.staff` — full URLs
+- `auth_mode` — `bearer` or `api_key`
+- `auth_value` — token / key
+- `api_key_header` — header name when `auth_mode = api_key` (default `X-API-Key`)
+- `timeout_seconds` — cURL timeout (default 10)
+- `verify_ssl` — set false only for local dev against `api.its_mock`
+
+**Bundled mock**: `pages/api.its_mock.php` serves a static JSON roster behind a configurable token. Point `its.endpoints.*` at it (e.g. `http://localhost/feulib/index.php?p=api.its_mock&kind=students`) to develop without a live ITS server.
+
+**CLI sync**: `db/sync_its.php` calls `its_sync()` and exits non-zero on failure. Schedule nightly via Windows Task Scheduler:
+
+```sh
+schtasks /Create /SC DAILY /TN "LFMS Sync ITS" /TR "php C:\xampp\htdocs\feulib\db\sync_its.php" /ST 02:00
+```
+
+**Schema**: the `its_users` table lives in `db/schema.sql`. If you upgraded from a pre-feature database, apply `db/migrations/2026_its_users.sql` once.

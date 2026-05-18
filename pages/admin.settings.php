@@ -195,7 +195,7 @@ page_header('System Settings');
         <div class="form-error"><?= e($errors['holding_period_days'][0]) ?></div>
       <?php endif; ?>
       <input type="number" id="holding_period_days" name="holding_period_days"
-             value="<?= e($_POST['holding_period_days'] ?? $setting('holding_period_days', '30')) ?>"
+             value="<?= e($_POST['holding_period_days'] ?? $setting('holding_period_days', '365')) ?>"
              min="1" max="365"
              class="form-control<?= !empty($errors['holding_period_days']) ? ' is-invalid' : '' ?>">
     </div>

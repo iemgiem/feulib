@@ -1,0 +1,461 @@
+/* ============================================================================
+   FEU LFMS — Design Tokens
+   Theme: "FEU Tamaraw Classic"
+   Last updated: 2026-05-17 (rev 3)
+
+   PURPOSE
+   Single source of truth for the design vocabulary. Components consume these
+   tokens; they never hardcode colors, sizes, or spacing.
+
+   LAYERING RULE (do not skip layers)
+     1. BRAND      Raw palette only. The only place hex colors live.
+     2. SEMANTIC   Purpose-named (text, bg, accent, status). Most components
+                   consume these.
+     3. SCALES     Numeric primitives (type, space, radius, shadow, motion,
+                   z-index, icons). Shared across components.
+     4. COMPONENT  Element-specific (header height, button states, badge
+                   palettes). All point upstream.
+
+   STRICT CONSTRAINTS
+   - Light mode only. Dark mode is out of scope for v1.
+   - System font stack only. No @font-face, no Google Fonts.
+   - Gold is decorative ONLY. Never carries meaning, never used as text on
+     white. Status meaning is carried by the badge text label and the
+     traffic-light palette (success/warning/danger/info/neutral).
+   - 4px spacing base.
+   - No bounce easing.
+
+   Pure tokens. Global reset and element defaults live in BASE.css.
+   ============================================================================ */
+
+:root {
+
+  /* ==========================================================================
+     1. BRAND TOKENS — raw palette only. Rename only on rebrand.
+     ========================================================================== */
+
+  /* -- FEU palette ---------------------------------------------------------- */
+  --feu-green:           #006400;        /* Primary brand */
+  --feu-green-dark:      #004d00;        /* Hover on primary */
+  --feu-green-darker:    #003300;        /* Active / pressed */
+  --feu-green-50:        #e8f1e8;        /* Faint tint — row + sidebar hover */
+  --feu-green-100:       #c8dec8;        /* Selected row tint */
+  --feu-gold:            #FFD700;        /* Accent — decorative only */
+  --feu-gold-dark:       #d4a700;        /* Hover on accent button */
+  --feu-gold-50:         #fff8dc;        /* Faint gold — released badge bg */
+
+  /* -- Neutrals (warm-leaning grays, institutional tone) -------------------- */
+  --gray-0:              #ffffff;
+  --gray-50:             #f7f9f7;
+  --gray-100:            #eef1ee;
+  --gray-200:            #e2e6e2;
+  --gray-300:            #cbd1cb;
+  --gray-400:            #9aa39a;
+  --gray-500:            #6e766e;
+  --gray-600:            #5a6b5a;
+  --gray-700:            #3f4a3f;
+  --gray-800:            #2a322a;
+  --gray-900:            #222222;
+  --gray-1000:           #0f120f;
+
+  /* -- Status palette (raw bg / fg / border per status color)
+        Foreground darkened where needed to meet WCAG AA (4.5:1) on the
+        matching pastel bg. Verified by calculation, not by eye. */
+  --green-bg:            #e6f4ea;
+  --green-fg:            #167030;       /* was #1f8f3a — failed AA on green-bg */
+  --green-border:        #b6e2c1;
+
+  --amber-bg:            #fff4e0;
+  --amber-fg:            #8a5800;       /* was #d48806 — failed AA on amber-bg */
+  --amber-border:        #f5d699;
+
+  --red-bg:              #fdecea;
+  --red-fg:              #c0392b;
+  --red-fg-hover:        #a23123;
+  --red-border:          #f3b4ad;
+
+  --blue-bg:             #e7f1f8;
+  --blue-fg:             #1c6ea4;
+  --blue-border:         #b8d3e5;
+
+  --neutral-bg:          #eceeec;
+  --neutral-fg:          #5a6b5a;
+  --neutral-border:      #cbd1cb;
+
+
+  /* ==========================================================================
+     2. SEMANTIC TOKENS — meaning-named; consume these in components.
+     ========================================================================== */
+
+  /* -- Accent (FEU green — used for brand presence + interactive emphasis) - */
+  /*    A single accent group covers the green header bar, table headers,
+        card stripes, sidebar active state, and primary buttons. They are
+        visually identical so they share one token group — keep simple. */
+  --color-accent:                 var(--feu-green);
+  --color-accent-hover:           var(--feu-green-dark);
+  --color-accent-active:          var(--feu-green-darker);
+
+  /* Gold accent — rare. Decorative only (header underline, card stripe
+     differentiation, RELEASED badge border, the single "Confirm Release"
+     button). Text on gold MUST be dark. */
+  --color-accent-secondary:       var(--feu-gold);
+  --color-accent-secondary-hover: var(--feu-gold-dark);
+  --color-accent-secondary-on:    var(--gray-900);
+
+  /* -- Backgrounds ---------------------------------------------------------- */
+  --color-bg:                     var(--gray-50);        /* Page */
+  --color-bg-subtle:              var(--gray-100);       /* Wells, disabled */
+  --color-bg-hover:               var(--feu-green-50);   /* Row + sidebar hover */
+  --color-bg-selected:            var(--feu-green-100);  /* Row selected */
+  --color-surface:                var(--gray-0);         /* Card, sidebar, modal, field */
+  --color-surface-alt:            var(--gray-50);        /* Zebra striping */
+  --color-overlay:                rgba(15, 18, 15, 0.45);/* Modal backdrop */
+
+  /* -- Text ----------------------------------------------------------------- */
+  --color-text:                   var(--gray-900);       /* Primary body text */
+  --color-text-muted:             var(--gray-600);       /* Secondary, helper */
+  --color-text-subtle:            var(--gray-500);       /* Placeholders */
+  --color-text-disabled:          var(--gray-400);
+  --color-text-inverse:           var(--gray-0);         /* On accent / dark bg */
+  --color-text-link:              var(--feu-green-dark);
+  --color-text-link-hover:        var(--feu-green-darker);
+
+  /* -- Borders -------------------------------------------------------------- */
+  --color-border:                 var(--gray-200);       /* Default 1px */
+  --color-border-strong:          var(--gray-300);       /* Emphasized */
+  --color-border-subtle:          var(--gray-100);       /* Hairlines */
+  --color-border-focus:           var(--feu-green);      /* 2px focus ring */
+
+  /* -- Status (semantic — text always conveys meaning, not just color) ----- */
+  --color-success:                var(--green-fg);
+  --color-success-bg:             var(--green-bg);
+  --color-success-border:         var(--green-border);
+
+  --color-warning:                var(--amber-fg);
+  --color-warning-bg:             var(--amber-bg);
+  --color-warning-border:         var(--amber-border);
+
+  --color-danger:                 var(--red-fg);
+  --color-danger-hover:           var(--red-fg-hover);
+  --color-danger-bg:              var(--red-bg);
+  --color-danger-border:          var(--red-border);
+
+  --color-info:                   var(--blue-fg);
+  --color-info-bg:                var(--blue-bg);
+  --color-info-border:            var(--blue-border);
+
+  --color-neutral:                var(--neutral-fg);
+  --color-neutral-bg:             var(--neutral-bg);
+  --color-neutral-border:         var(--neutral-border);
+
+
+  /* ==========================================================================
+     3. SCALES — global numeric primitives. No colors here.
+     ========================================================================== */
+
+  /* -- Typography ----------------------------------------------------------- */
+  --font-family-base:    "Segoe UI", Tahoma, "Helvetica Neue", Arial, sans-serif;
+  --font-family-display: var(--font-family-base);
+  --font-family-mono:    "Consolas", "Courier New", monospace;
+
+  --font-size-xs:        0.75rem;        /* 12 */
+  --font-size-sm:        0.875rem;       /* 14 */
+  --font-size-base:      1rem;           /* 16 */
+  --font-size-md:        1.125rem;       /* 18 */
+  --font-size-lg:        1.25rem;        /* 20 */
+  --font-size-xl:        1.5rem;         /* 24 */
+  --font-size-2xl:       1.875rem;       /* 30 */
+  --font-size-3xl:       2.25rem;        /* 36 */
+
+  --font-weight-normal:    400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
+
+  --line-height-tight:     1.25;
+  --line-height-snug:      1.4;
+  --line-height-normal:    1.5;
+  --line-height-relaxed:   1.65;
+
+  --letter-spacing-tight:   -0.01em;
+  --letter-spacing-normal:   0;
+  --letter-spacing-wide:     0.04em;     /* All-caps badges, table headers */
+
+  /* -- Spacing (4px base) --------------------------------------------------- */
+  --space-0:       0;
+  --space-px:      1px;
+  --space-1:       0.25rem;     /*  4 */
+  --space-2:       0.5rem;      /*  8 */
+  --space-3:       0.75rem;     /* 12 */
+  --space-4:       1rem;        /* 16 — base */
+  --space-5:       1.25rem;     /* 20 */
+  --space-6:       1.5rem;      /* 24 — card padding, card gap */
+  --space-7:       2rem;        /* 32 — main content padding */
+  --space-8:       2.5rem;      /* 40 */
+  --space-9:       3rem;        /* 48 */
+  --space-10:      4rem;        /* 64 */
+  --space-11:      5rem;        /* 80 */
+  --space-12:      6rem;        /* 96 */
+
+  /* -- Border radius -------------------------------------------------------- */
+  --radius-xs:           2px;
+  --radius-sm:           4px;
+  --radius-md:           6px;        /* Default — cards, buttons, fields */
+  --radius-lg:           8px;        /* Modals */
+  --radius-pill:         9999px;     /* Status badges */
+
+  /* -- Shadows (used sparingly — institutional aesthetic) ------------------ */
+  --shadow-none:         none;
+  --shadow-xs:           0 1px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm:           0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md:           0 4px 12px rgba(0, 0, 0, 0.08);   /* Dropdowns, tooltips */
+  --shadow-lg:           0 16px 40px rgba(0, 0, 0, 0.16);  /* Modals */
+  --shadow-focus:        0 0 0 2px var(--gray-0),
+                         0 0 0 4px var(--color-border-focus); /* Field focus ring */
+
+  /* -- Motion (restrained — no bounce) ------------------------------------- */
+  --duration-instant:    50ms;
+  --duration-fast:       120ms;
+  --duration-normal:     200ms;
+  --duration-slow:       320ms;
+
+  --easing-default:      cubic-bezier(0.4, 0, 0.2, 1);   /* ease-in-out */
+  --easing-in:           cubic-bezier(0.4, 0, 1, 1);
+  --easing-out:          cubic-bezier(0, 0, 0.2, 1);
+
+  /* -- Layout widths -------------------------------------------------------- */
+  --max-width-content:       72ch;
+  --max-width-page:          1280px;
+  --max-width-form:          640px;
+  --max-width-card-narrow:   380px;       /* Login / register card */
+  --max-width-modal:         560px;
+
+  /* -- Breakpoints (informational — CSS vars do not work inside @media) ---- */
+  --bp-sm:   640px;
+  --bp-md:   768px;
+  --bp-lg:   1024px;
+  --bp-xl:   1280px;
+
+  /* -- Z-index (single source of truth) ------------------------------------ */
+  --z-base:        0;
+  --z-raised:      10;       /* Sticky page strips */
+  --z-sidebar:     20;
+  --z-header:      30;
+  --z-dropdown:    40;       /* Notification bell, autocomplete, tooltip */
+  --z-overlay:     50;       /* Modal backdrop */
+  --z-modal:       60;
+  --z-toast:       70;       /* Always on top */
+
+  /* -- Icon sizes (inline SVG / Unicode glyphs) ---------------------------- */
+  --icon-xs:       12px;     /* Inline with body text */
+  --icon-sm:       16px;     /* Buttons */
+  --icon-md:       20px;     /* Sidebar nav */
+  --icon-lg:       24px;     /* Header bell, large controls */
+  --icon-xl:       32px;     /* Empty-state */
+
+
+  /* ==========================================================================
+     4. COMPONENT TOKENS — element-specific. Reference semantic + scales.
+     ========================================================================== */
+
+  /* -- App shell ------------------------------------------------------------ */
+  --shell-header-height:        60px;
+  --shell-header-bg:            var(--color-accent);
+  --shell-header-fg:            var(--color-text-inverse);
+  --shell-header-accent-color:  var(--color-accent-secondary);    /* Gold underline */
+  --shell-header-accent-height: 3px;
+
+  --shell-sidebar-width:            240px;
+  --shell-sidebar-width-rail:       64px;
+  --shell-sidebar-bg:               var(--color-surface);
+  --shell-sidebar-fg:               var(--color-text);
+  --shell-sidebar-hover-bg:         var(--color-bg-hover);
+  --shell-sidebar-active-bg:        var(--color-bg-hover);
+  --shell-sidebar-active-fg:        var(--color-accent-hover);
+  --shell-sidebar-active-bar-color: var(--color-accent);
+  --shell-sidebar-active-bar-width: 4px;
+  --shell-sidebar-divider:          var(--color-border);
+
+  --shell-main-padding:         var(--space-7);
+  --shell-content-max:          var(--max-width-page);
+
+  /* -- Buttons -------------------------------------------------------------- */
+  --btn-height-sm:        28px;
+  --btn-height-md:        36px;                              /* Default */
+  --btn-height-lg:        44px;                              /* Touch target */
+  --btn-padding-x:        var(--space-4);
+  --btn-radius:           var(--radius-md);
+  --btn-font-weight:      var(--font-weight-semibold);
+  --btn-font-size:        var(--font-size-sm);
+
+  --btn-primary-bg:        var(--color-accent);
+  --btn-primary-fg:        var(--color-text-inverse);
+  --btn-primary-bg-hover:  var(--color-accent-hover);
+  --btn-primary-bg-active: var(--color-accent-active);
+  --btn-primary-border:    transparent;
+
+  --btn-accent-bg:         var(--color-accent-secondary);
+  --btn-accent-fg:         var(--color-accent-secondary-on);
+  --btn-accent-bg-hover:   var(--color-accent-secondary-hover);
+  --btn-accent-border:     transparent;
+
+  --btn-ghost-bg:          var(--color-surface);
+  --btn-ghost-fg:          var(--color-text);
+  --btn-ghost-border:      var(--color-border-strong);
+  --btn-ghost-bg-hover:    var(--color-bg-hover);
+  --btn-ghost-fg-hover:    var(--color-accent-hover);
+
+  --btn-danger-bg:         var(--color-danger);
+  --btn-danger-fg:         var(--color-text-inverse);
+  --btn-danger-bg-hover:   var(--color-danger-hover);
+  --btn-danger-border:     transparent;
+
+  --btn-link-fg:           var(--color-text-link);
+  --btn-link-fg-hover:     var(--color-text-link-hover);
+
+  /* -- Cards ---------------------------------------------------------------- */
+  --card-bg:               var(--color-surface);
+  --card-border:           var(--color-border);
+  --card-border-width:     1px;
+  --card-bar-color:        var(--color-accent);             /* Green left stripe */
+  --card-bar-width:        4px;
+  --card-radius:           var(--radius-md);
+  --card-padding:          var(--space-6);
+  --card-padding-sm:       var(--space-4);
+  --card-gap:              var(--space-6);
+
+  /* -- Form fields ---------------------------------------------------------- */
+  --field-height:          40px;
+  --field-padding-x:       var(--space-3);
+  --field-bg:              var(--color-surface);
+  --field-bg-disabled:     var(--color-bg-subtle);
+  --field-border:          var(--color-border-strong);
+  --field-border-hover:    var(--gray-400);
+  --field-border-focus:    var(--color-border-focus);
+  --field-radius:          var(--radius-md);
+  --field-fg:              var(--color-text);
+  --field-placeholder:     var(--color-text-subtle);
+  --field-label-fg:        var(--color-text);
+  --field-label-weight:    var(--font-weight-semibold);
+  --field-helper-fg:       var(--color-text-muted);
+  --field-error-fg:        var(--color-danger);
+  --field-error-bg:        var(--color-danger-bg);
+  --field-error-border:    var(--color-danger);
+
+  /* -- Tables --------------------------------------------------------------- */
+  --table-header-bg:        var(--color-accent);
+  --table-header-fg:        var(--color-text-inverse);
+  --table-header-weight:    var(--font-weight-semibold);
+  --table-header-tracking:  var(--letter-spacing-wide);
+  --table-row-bg:           var(--color-surface);
+  --table-row-bg-alt:       var(--color-surface-alt);
+  --table-row-bg-hover:     var(--color-bg-hover);
+  --table-row-bg-selected:  var(--color-bg-selected);
+  --table-row-border:       var(--color-border);
+  --table-cell-padding-y:   var(--space-3);
+  --table-cell-padding-x:   var(--space-4);
+
+  /* -- Status badges (all 8 LFMS states) ----------------------------------- */
+  --badge-radius:           var(--radius-pill);
+  --badge-padding-y:        var(--space-1);
+  --badge-padding-x:        var(--space-3);
+  --badge-font-size:        var(--font-size-xs);
+  --badge-font-weight:      var(--font-weight-semibold);
+  --badge-tracking:         var(--letter-spacing-wide);
+
+  /* OPEN — info */
+  --badge-open-bg:          var(--color-info-bg);
+  --badge-open-fg:          var(--color-info);
+  --badge-open-border:      var(--color-info-border);
+
+  /* MATCHED — info, stronger border to differentiate from OPEN */
+  --badge-matched-bg:       var(--color-info-bg);
+  --badge-matched-fg:       var(--color-info);
+  --badge-matched-border:   var(--color-info);
+
+  /* PENDING — warning */
+  --badge-pending-bg:       var(--color-warning-bg);
+  --badge-pending-fg:       var(--color-warning);
+  --badge-pending-border:   var(--color-warning-border);
+
+  /* APPROVED — success */
+  --badge-approved-bg:      var(--color-success-bg);
+  --badge-approved-fg:      var(--color-success);
+  --badge-approved-border:  var(--color-success-border);
+
+  /* REJECTED — danger */
+  --badge-rejected-bg:      var(--color-danger-bg);
+  --badge-rejected-fg:      var(--color-danger);
+  --badge-rejected-border:  var(--color-danger-border);
+
+  /* RELEASED — success text + decorative gold border. Gold is decorative
+     only; the badge text label "RELEASED" carries the meaning. */
+  --badge-released-bg:      var(--feu-gold-50);
+  --badge-released-fg:      var(--color-accent-hover);
+  --badge-released-border:  var(--color-accent-secondary);
+
+  /* EXPIRED — neutral muted */
+  --badge-expired-bg:       var(--color-neutral-bg);
+  --badge-expired-fg:       var(--color-neutral);
+  --badge-expired-border:   var(--color-neutral-border);
+
+  /* DONATED — neutral muted (distinguished by italics in component CSS) */
+  --badge-donated-bg:       var(--color-neutral-bg);
+  --badge-donated-fg:       var(--color-neutral);
+  --badge-donated-border:   var(--color-neutral-border);
+
+  /* -- Match score chip (low / medium / high traffic light) ---------------- */
+  --score-low-bg:           var(--color-danger-bg);
+  --score-low-fg:           var(--color-danger);
+  --score-medium-bg:        var(--color-warning-bg);
+  --score-medium-fg:        var(--color-warning);
+  --score-high-bg:          var(--color-success-bg);
+  --score-high-fg:          var(--color-success);
+
+  /* Numeric thresholds (unitless on purpose — readable by JS via
+     getComputedStyle().getPropertyValue() + parseInt). */
+  --score-threshold-high:   70;
+  --score-threshold-medium: 40;
+
+  /* -- Modals --------------------------------------------------------------- */
+  --modal-bg:             var(--color-surface);
+  --modal-radius:         var(--radius-lg);
+  --modal-padding:        var(--space-7);
+  --modal-shadow:         var(--shadow-lg);
+  --modal-max-width:      var(--max-width-modal);
+  --modal-backdrop:       var(--color-overlay);
+
+  /* -- Toasts --------------------------------------------------------------- */
+  --toast-bg:             var(--color-surface);
+  --toast-fg:             var(--color-text);
+  --toast-border:         var(--color-border-strong);
+  --toast-radius:         var(--radius-md);
+  --toast-padding:        var(--space-4);
+  --toast-shadow:         var(--shadow-md);
+  --toast-success-accent: var(--color-success);
+  --toast-warning-accent: var(--color-warning);
+  --toast-danger-accent:  var(--color-danger);
+  --toast-info-accent:    var(--color-info);
+
+  /* -- Tooltips (icon-only buttons, match-score factor breakdown) ---------- */
+  --tooltip-bg:           var(--gray-900);
+  --tooltip-fg:           var(--color-text-inverse);
+  --tooltip-padding-y:    var(--space-2);
+  --tooltip-padding-x:    var(--space-3);
+  --tooltip-radius:       var(--radius-sm);
+  --tooltip-font-size:    var(--font-size-xs);
+  --tooltip-max-width:    240px;
+  --tooltip-shadow:       var(--shadow-md);
+
+  /* -- Signature pad ------------------------------------------------------- */
+  --signature-bg:         var(--color-surface);
+  --signature-border:     var(--color-border-strong);
+  --signature-ink:        var(--color-text);
+  --signature-height:     180px;
+
+  /* -- Selfie capture ------------------------------------------------------ */
+  --capture-bg:           var(--gray-900);
+  --capture-fg:           var(--color-text-inverse);
+  --capture-border:       var(--color-border-strong);
+  --capture-aspect:       4 / 3;
+}

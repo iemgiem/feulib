@@ -3,19 +3,38 @@ declare(strict_types=1);
 
 /**
  * Notifications — full list for the current user.
- * Marks all unread as read on page load.
- * POST ?mark=N marks a single notification as read (used by JS if needed).
+ *
+ * GET  ?p=notifications              List notifications (read + unread).
+ * POST ?p=notifications  action=read_all
+ *                                     Mark every unread notification as read.
+ *
+ * Bulk marking is POST-only on purpose: a GET-time side effect would let
+ * browser prefetch / link preview clear the unread badge silently.
  */
 
 $user    = current_user();
 $user_id = (int) $user['id'];
 
-// Mark all unread as read on arrival (bulk).
-q(
-    'UPDATE notifications SET is_read = 1, read_at = NOW()
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_check();
+
+    if (($_POST['action'] ?? '') === 'read_all') {
+        q(
+            'UPDATE notifications SET is_read = 1, read_at = NOW()
+              WHERE recipient_account_id = ? AND is_read = 0',
+            [$user_id]
+        );
+        flash_set('success', 'All notifications marked as read.');
+    }
+
+    go(url('/index.php?p=notifications'));
+}
+
+$unread_total = (int) (q_value(
+    'SELECT COUNT(*) FROM notifications
       WHERE recipient_account_id = ? AND is_read = 0',
     [$user_id]
-);
+) ?? 0);
 
 $state = table_state('', [
     'sort'     => 'date',
@@ -43,7 +62,24 @@ $base = ['p' => 'notifications'];
 
 layout_open('Notifications');
 
-page_header('Notifications');
+$success = flash_get('success');
+if ($success) {
+    echo '<div class="alert alert-success" role="status">' . e($success) . '</div>';
+}
+
+$mark_all_form = '';
+if ($unread_total > 0) {
+    $mark_all_form =
+        '<form method="POST" action="' . e(url('/index.php?p=notifications')) . '" style="display:inline;">'
+        . csrf_field()
+        . '<input type="hidden" name="action" value="read_all">'
+        . '<button type="submit" class="btn btn-ghost btn-sm">'
+        . 'Mark all as read (' . (int) $unread_total . ')'
+        . '</button>'
+        . '</form>';
+}
+
+page_header('Notifications', $mark_all_form);
 ?>
 
 <section class="card">
@@ -58,13 +94,16 @@ page_header('Notifications');
   <?php else: ?>
     <ul class="list">
       <?php foreach ($notifs as $n): ?>
-        <li class="list-item">
+        <li class="list-item<?= empty($n['is_read']) ? ' list-item-unread' : '' ?>">
           <div class="list-item-body">
             <p class="list-item-title">
               <?php if (!empty($n['link_url'])): ?>
                 <a href="<?= e(url((string) $n['link_url'])) ?>"><?= e((string) $n['title']) ?></a>
               <?php else: ?>
                 <?= e((string) $n['title']) ?>
+              <?php endif; ?>
+              <?php if (empty($n['is_read'])): ?>
+                <span class="badge badge-info" style="margin-left: var(--space-2);">new</span>
               <?php endif; ?>
             </p>
             <p class="list-item-text"><?= e((string) $n['body']) ?></p>

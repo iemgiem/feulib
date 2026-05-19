@@ -258,7 +258,8 @@ page_header(
 
     <?php if ($lost_photo): ?>
       <div class="detail-photo">
-        <img src="<?= e(upload_url($lost_photo)) ?>" alt="Photo of the lost item">
+        <img src="<?= e(upload_url($lost_photo)) ?>"
+             alt="<?= e(category_label((string) $match['lost_category']) . ', ' . (string) $match['lost_color']) ?>">
       </div>
     <?php endif; ?>
 
@@ -306,7 +307,8 @@ page_header(
 
     <?php if ($found_photo): ?>
       <div class="detail-photo">
-        <img src="<?= e(upload_url($found_photo)) ?>" alt="Photo of the found item">
+        <img src="<?= e(upload_url($found_photo)) ?>"
+             alt="<?= e(category_label((string) $match['found_category']) . ', ' . (string) $match['found_color']) ?>">
       </div>
     <?php endif; ?>
 

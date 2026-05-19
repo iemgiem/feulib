@@ -105,9 +105,9 @@ page_header('My Claims');
       <table class="data-table">
         <thead>
           <tr>
-            <th><?= sort_link('ref', 'Reference', $state, '', $base_with_state) ?></th>
+            <th<?= sort_aria('ref', $state) ?>><?= sort_link('ref', 'Reference', $state, '', $base_with_state) ?></th>
             <th>Item</th>
-            <th class="col-narrow"><?= sort_link('created', 'Created', $state, '', $base_with_state) ?></th>
+            <th class="col-narrow"<?= sort_aria('created', $state) ?>><?= sort_link('created', 'Created', $state, '', $base_with_state) ?></th>
             <th class="col-narrow">Status</th>
             <th class="col-actions">Action</th>
           </tr>

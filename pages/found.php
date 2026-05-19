@@ -169,10 +169,10 @@ page_header(
       <table class="data-table">
         <thead>
           <tr>
-            <th><?= sort_link('ref', 'Reference', $state, '', $base) ?></th>
+            <th<?= sort_aria('ref', $state) ?>><?= sort_link('ref', 'Reference', $state, '', $base) ?></th>
             <th>Item</th>
             <th class="col-narrow">Location</th>
-            <th class="col-narrow"><?= sort_link('date', 'Date found', $state, '', $base) ?></th>
+            <th class="col-narrow"<?= sort_aria('date', $state) ?>><?= sort_link('date', 'Date found', $state, '', $base) ?></th>
             <th class="col-narrow">Logged by</th>
             <th class="col-narrow">Status</th>
           </tr>

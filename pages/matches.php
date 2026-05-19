@@ -129,10 +129,10 @@ page_header('All Matches');
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-narrow"><?= sort_link('score', 'Score', $state, '', $base_with_state) ?></th>
+            <th class="col-narrow"<?= sort_aria('score', $state) ?>><?= sort_link('score', 'Score', $state, '', $base_with_state) ?></th>
             <th>Lost item</th>
             <th>Found item</th>
-            <th class="col-narrow"><?= sort_link('age', 'Age', $state, '', $base_with_state) ?></th>
+            <th class="col-narrow"<?= sort_aria('age', $state) ?>><?= sort_link('age', 'Age', $state, '', $base_with_state) ?></th>
             <th class="col-narrow">Status</th>
             <th class="col-actions">Action</th>
           </tr>

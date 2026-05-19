@@ -303,10 +303,10 @@ page_header(
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-narrow"><?= sort_link('score', 'Score', $m_state, 'm_', $m_base) ?></th>
+            <th class="col-narrow"<?= sort_aria('score', $m_state) ?>><?= sort_link('score', 'Score', $m_state, 'm_', $m_base) ?></th>
             <th>Lost item</th>
             <th>Found item</th>
-            <th class="col-narrow"><?= sort_link('age', 'Age', $m_state, 'm_', $m_base) ?></th>
+            <th class="col-narrow"<?= sort_aria('age', $m_state) ?>><?= sort_link('age', 'Age', $m_state, 'm_', $m_base) ?></th>
             <th class="col-narrow">Status</th>
             <th class="col-actions">Action</th>
           </tr>
@@ -382,10 +382,10 @@ page_header(
       <table class="data-table">
         <thead>
           <tr>
-            <th><?= sort_link('ref', 'Reference', $c_state, 'c_', $c_base) ?></th>
+            <th<?= sort_aria('ref', $c_state) ?>><?= sort_link('ref', 'Reference', $c_state, 'c_', $c_base) ?></th>
             <th>Claimant</th>
             <th>Item</th>
-            <th class="col-narrow"><?= sort_link('submitted', 'Submitted', $c_state, 'c_', $c_base) ?></th>
+            <th class="col-narrow"<?= sort_aria('submitted', $c_state) ?>><?= sort_link('submitted', 'Submitted', $c_state, 'c_', $c_base) ?></th>
             <th class="col-narrow">Status</th>
             <th class="col-actions">Action</th>
           </tr>

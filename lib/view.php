@@ -229,6 +229,8 @@ function table_state(string $prefix = '', array $defaults = []): array
 /**
  * Render a sortable column header link. Toggles dir when clicking the active
  * column. Always resets the page to 1 when the sort changes.
+ *
+ * For the matching aria-sort attribute on the enclosing <th>, see sort_aria().
  */
 function sort_link(string $column, string $label, array $state, string $prefix = '', array $base = []): string
 {
@@ -249,6 +251,25 @@ function sort_link(string $column, string $label, array $state, string $prefix =
          . e($label)
          . '<span class="sort-indicator" aria-hidden="true">' . $indicator . '</span>'
          . '</a>';
+}
+
+/**
+ * Return ` aria-sort="ascending|descending"` (leading space) for the <th>
+ * that wraps the active sort_link(), or `""` for any other column. Companion
+ * to sort_link() — together they close ACCESSIBILITY.md #2 (WCAG 4.1.2).
+ *
+ *   <th<?= sort_aria('ref', $state) ?>><?= sort_link('ref', 'Ref', $state) ?></th>
+ *
+ * Pass the same $state you give sort_link(); $state['dir'] should already be
+ * one of 'asc' / 'desc' (table_state() guarantees this).
+ */
+function sort_aria(string $column, array $state): string
+{
+    if (($state['sort'] ?? '') !== $column) {
+        return '';
+    }
+    $dir = ($state['dir'] ?? 'asc') === 'asc' ? 'ascending' : 'descending';
+    return ' aria-sort="' . $dir . '"';
 }
 
 /**

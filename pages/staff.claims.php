@@ -128,10 +128,10 @@ page_header('All Claims');
       <table class="data-table">
         <thead>
           <tr>
-            <th><?= sort_link('ref', 'Reference', $state, '', $base_with_state) ?></th>
+            <th<?= sort_aria('ref', $state) ?>><?= sort_link('ref', 'Reference', $state, '', $base_with_state) ?></th>
             <th>Claimant</th>
             <th>Item</th>
-            <th class="col-narrow"><?= sort_link('submitted', 'Created', $state, '', $base_with_state) ?></th>
+            <th class="col-narrow"<?= sort_aria('submitted', $state) ?>><?= sort_link('submitted', 'Created', $state, '', $base_with_state) ?></th>
             <th class="col-narrow">Status</th>
             <th class="col-actions">Action</th>
           </tr>

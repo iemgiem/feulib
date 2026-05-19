@@ -1,0 +1,21 @@
+# FEU LFMS — Apache rewrite rules.
+#
+# The only rule here forwards the `Authorization` request header into PHP's
+# $_SERVER superglobal. Without this, mod_php on Apache (the XAMPP default)
+# strips `Authorization` before it reaches `$_SERVER['HTTP_AUTHORIZATION']`,
+# which breaks the ITS integration's Bearer auth in pages/api.its_mock.php.
+#
+# Two forms cover the common SAPI configurations:
+#   - mod_setenvif: works on mod_php (Apache's default for XAMPP).
+#   - mod_rewrite:  works on PHP-FPM and CGI deployments.
+# If either module is unavailable the directive is silently ignored.
+
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} ^(.+)$
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>

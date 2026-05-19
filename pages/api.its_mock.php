@@ -27,17 +27,45 @@ header('Cache-Control: no-store');
 $mode     = (string) (cfg('its.auth_mode')  ?? 'bearer');
 $expected = (string) (cfg('its.auth_value') ?? '');
 
+// Apache + mod_php strips the `Authorization` header from $_SERVER by default,
+// so we have to try several fallbacks. The order below is "cheapest first" —
+// in production behind a configured Apache, the very first lookup wins.
+$read_request_header = static function (string $name): string {
+    $server_key = 'HTTP_' . strtoupper(str_replace('-', '_', $name));
+    $value = (string) ($_SERVER[$server_key] ?? '');
+    if ($value !== '') {
+        return $value;
+    }
+    // Some PHP-FPM / CGI setups expose Authorization only via REDIRECT_*.
+    $redirect_key = 'REDIRECT_' . $server_key;
+    $value = (string) ($_SERVER[$redirect_key] ?? '');
+    if ($value !== '') {
+        return $value;
+    }
+    // Last resort: SAPI header table. getallheaders() is case-insensitive on
+    // the keys it returns, but we iterate to stay portable across SAPIs.
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        if (is_array($headers)) {
+            foreach ($headers as $k => $v) {
+                if (strcasecmp((string) $k, $name) === 0) {
+                    return (string) $v;
+                }
+            }
+        }
+    }
+    return '';
+};
+
 $provided = '';
 if ($mode === 'bearer') {
-    $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    $auth = $read_request_header('Authorization');
     if (stripos($auth, 'Bearer ') === 0) {
         $provided = trim(substr($auth, 7));
     }
 } elseif ($mode === 'api_key') {
     $header_name = (string) (cfg('its.api_key_header') ?? 'X-API-Key');
-    // Convert "X-API-Key" → "HTTP_X_API_KEY"
-    $server_key  = 'HTTP_' . strtoupper(str_replace('-', '_', $header_name));
-    $provided    = (string) ($_SERVER[$server_key] ?? '');
+    $provided    = $read_request_header($header_name);
 }
 
 if ($expected === '' || $provided === '' || !hash_equals($expected, $provided)) {

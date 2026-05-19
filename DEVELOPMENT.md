@@ -334,6 +334,19 @@ its_last_sync_at():             ?string // MAX(last_synced_at).
 schtasks /Create /SC DAILY /TN "LFMS Sync ITS" /TR "php C:\xampp\htdocs\feulib\db\sync_its.php" /ST 02:00
 ```
 
+**CLI probe**: `db/its_probe.php` hits the configured endpoint(s), validates
+the response shape, and prints a sample normalised row. Read-only — no DB
+writes, no audit row. Run this whenever the ITS URL or auth value changes,
+**before** scheduling or re-running the sync.
+
+```sh
+php db/its_probe.php             # probe both endpoints
+php db/its_probe.php --students  # one at a time
+```
+
+The probe also flags when `its.auth_value` is still the shipped
+`dev-token-change-me-before-production` placeholder.
+
 **Schema**: the `its_users` table lives in `db/schema.sql`. If you upgraded from a pre-feature database, apply `db/migrations/2026_its_users.sql` once.
 
 ---

@@ -4,6 +4,9 @@
    without a full page reload. The markup in partials/header.php is the
    server-rendered baseline; this script keeps it in sync client-side.
 
+   Also announces new notifications through the polite #toast-region
+   live region so screen-reader users hear when the badge changes.
+
    No dependencies. Vanilla JS, IIFE-scoped.
    ============================================================================ */
 (function () {
@@ -20,6 +23,60 @@
     clean.searchParams.set('p', 'api.notifications');
     return clean.toString();
   }());
+
+  // Seed previous count from the server-rendered badge so we don't announce
+  // notifications that were already on screen when the page loaded.
+  var previousUnread = (function () {
+    var badge = document.querySelector('.app-header-bell .app-header-bell-badge');
+    if (!badge) return 0;
+    var n = parseInt((badge.textContent || '0').replace(/[^0-9]/g, ''), 10);
+    return isNaN(n) ? 0 : n;
+  }());
+
+  function announce(message) {
+    if (!message) return;
+    var region = document.getElementById('toast-region');
+    if (!region) return;
+    // Wrap each message in its own element so consecutive polls with the
+    // same text still get announced (changing textContent on the parent
+    // would deduplicate in some screen readers).
+    var line = document.createElement('p');
+    line.textContent = message;
+    region.appendChild(line);
+    // Trim history so the region doesn't grow unbounded over a long session.
+    while (region.childNodes.length > 5) {
+      region.removeChild(region.firstChild);
+    }
+  }
+
+  function announceIfNew(unread, items) {
+    if (unread <= previousUnread) {
+      previousUnread = unread;
+      return;
+    }
+    var delta = unread - previousUnread;
+    previousUnread = unread;
+
+    // Find the most recent unread item to read out by title.
+    var firstUnread = null;
+    if (Array.isArray(items)) {
+      for (var i = 0; i < items.length; i++) {
+        if (!items[i].is_read) { firstUnread = items[i]; break; }
+      }
+    }
+    if (firstUnread && firstUnread.title) {
+      if (delta === 1) {
+        announce('New notification: ' + firstUnread.title);
+      } else {
+        announce('New notification: ' + firstUnread.title +
+                 ' (and ' + (delta - 1) + ' more)');
+      }
+    } else {
+      announce(delta === 1
+        ? 'You have 1 new notification.'
+        : 'You have ' + delta + ' new notifications.');
+    }
+  }
 
   function updateBell(unread) {
     var bell = document.querySelector('.app-header-bell');
@@ -60,6 +117,7 @@
       })
       .then(function (data) {
         if (data && typeof data.unread === 'number') {
+          announceIfNew(data.unread, data.items);
           updateBell(data.unread);
         }
       })

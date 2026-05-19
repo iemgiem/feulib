@@ -289,17 +289,21 @@ page_header($claim['ref_number'], status_badge((string) $claim['status']));
           <div class="form-group">
             <label for="signature" class="form-label form-label-required">Claimant signature</label>
             <?= field_error_html('signature', $errors) ?>
-            <input type="file" id="signature" name="signature" accept="image/*"
-                   class="form-control<?= !empty($errors['signature']) ? ' is-invalid' : '' ?>"<?= field_aria('signature', $errors) ?>>
-            <span class="form-hint">Upload a photo of the signed release form or use a signature-capture app.</span>
+            <div class="sig-pad" data-sig-pad>
+              <input type="file" id="signature" name="signature" accept="image/*"
+                     class="form-control<?= !empty($errors['signature']) ? ' is-invalid' : '' ?>"<?= field_aria('signature', $errors) ?>>
+            </div>
+            <span class="form-hint">Sign with your finger, mouse, or pen — or use the link above to upload an existing photo.</span>
           </div>
 
           <div class="form-group">
             <label for="selfie" class="form-label form-label-required">Selfie with claimant</label>
             <?= field_error_html('selfie', $errors) ?>
-            <input type="file" id="selfie" name="selfie" accept="image/*"
-                   class="form-control<?= !empty($errors['selfie']) ? ' is-invalid' : '' ?>"<?= field_aria('selfie', $errors) ?>>
-            <span class="form-hint">Take a photo of the claimant holding the released item.</span>
+            <div class="selfie-cap" data-selfie-cap>
+              <input type="file" id="selfie" name="selfie" accept="image/*"
+                     class="form-control<?= !empty($errors['selfie']) ? ' is-invalid' : '' ?>"<?= field_aria('selfie', $errors) ?>>
+            </div>
+            <span class="form-hint">Take a photo of the claimant holding the released item — or use the link above to upload one.</span>
           </div>
 
           <div class="form-group">

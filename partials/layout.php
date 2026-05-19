@@ -107,6 +107,8 @@ function layout_close(): void
   <script src="<?= e(asset('js/notifications.js')) ?>" defer></script>
   <script src="<?= e(asset('js/modal.js')) ?>" defer></script>
   <script src="<?= e(asset('js/sidebar-drawer.js')) ?>" defer></script>
+  <script src="<?= e(asset('js/signature-pad.js')) ?>" defer></script>
+  <script src="<?= e(asset('js/selfie-capture.js')) ?>" defer></script>
 </body>
 </html>
 <?php

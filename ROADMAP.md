@@ -76,8 +76,8 @@ Format: `[x]` = done in code, `[~]` = done in code but unverified in browser,
 - [x] Release workflow — base
 - [~] Release — required-reason modal (commit `95aa5e4`)
 - [~] Release — 1.5s hold-to-confirm button (commit `95aa5e4`)
-- [ ] Release — signature pad (ACCESSIBILITY.md #5)
-- [ ] Release — selfie capture (ACCESSIBILITY.md #5)
+- [~] Release — signature pad (ACCESSIBILITY.md #5, branch `signature-selfie`)
+- [~] Release — selfie capture (ACCESSIBILITY.md #5, branch `signature-selfie`)
 - [x] Audit log (`lib/audit.php` + `audit_logs` table)
 - [x] Admin reports + CSV export (`lib/export.php`)
 - [x] Notification polling (`assets/js/notifications.js`)
@@ -94,7 +94,7 @@ Must fix:
 Should fix:
 - [~] #3 Explicit toast live region (commit `95aa5e4` + `3014fa1`)
 - [~] #4 Required-reason modal replaces `confirm()` (commit `95aa5e4`)
-- [ ] #5 Signature pad + selfie capture — see Features above
+- [~] #5 Signature pad + selfie capture — see Features above (branch `signature-selfie`)
 - [~] #6 Responsive shell with hamburger drawer (commit `7f2afeb`)
 - [x] #7 Skip-to-content link (already shipped before `task27modal`)
 

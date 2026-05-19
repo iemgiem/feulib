@@ -65,9 +65,9 @@ function csv_row($handle, array $row): void
         return (string) $v;
     }, $row);
 
-    // Default separator/enclosure/escape — explicit so future PHP changes
-    // don't shift behaviour silently.
-    fputcsv($handle, $cleaned, ',', '"', '\\');
+    // Empty escape opts into RFC 4180 quoting (PHP 8.4+ deprecates the
+    // legacy "\\" escape; "" disables it and matches what Excel expects).
+    fputcsv($handle, $cleaned, ',', '"', '');
 }
 
 function csv_section($handle, string $title, array $header, array $rows): void

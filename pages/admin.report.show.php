@@ -67,7 +67,10 @@ if (($_GET['format'] ?? '') === 'csv') {
             $match_total = (int) (q_value("SELECT COUNT(*) FROM matches       WHERE created_at BETWEEN ? AND ?", [$range_from, $range_to]) ?? 0);
             $approved    = (int) (q_value("SELECT COUNT(*) FROM matches       WHERE status = 'approved' AND created_at BETWEEN ? AND ?", [$range_from, $range_to]) ?? 0);
             $released    = (int) (q_value("SELECT COUNT(*) FROM claim_tickets WHERE status = 'released' AND created_at BETWEEN ? AND ?", [$range_from, $range_to]) ?? 0);
-            $expired     = (int) (q_value("SELECT COUNT(*) FROM found_reports WHERE status = 'expired'  AND updated_at BETWEEN ? AND ?", [$range_from, $range_to]) ?? 0);
+            // Count from audit_logs so later edits to the row don't shift the
+            // count out of the report period (found_reports.updated_at bumps
+            // on every UPDATE; audit row's created_at is the actual expiry).
+            $expired     = (int) (q_value("SELECT COUNT(*) FROM audit_logs WHERE action = 'found_report.expire' AND created_at BETWEEN ? AND ?", [$range_from, $range_to]) ?? 0);
 
             $match_rate = $lost_total > 0 ? round($approved / $lost_total * 100, 1) : 0;
             $claim_rate = $approved  > 0 ? round($released  / $approved  * 100, 1) : 0;
@@ -196,7 +199,7 @@ if ($type === 'operational_summary'):
     $match_total  = (int) (q_value("SELECT COUNT(*) FROM matches       WHERE created_at BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']) ?? 0);
     $approved     = (int) (q_value("SELECT COUNT(*) FROM matches       WHERE status = 'approved' AND created_at BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']) ?? 0);
     $released     = (int) (q_value("SELECT COUNT(*) FROM claim_tickets WHERE status = 'released' AND created_at BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']) ?? 0);
-    $expired      = (int) (q_value("SELECT COUNT(*) FROM found_reports WHERE status = 'expired'  AND updated_at BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']) ?? 0);
+    $expired      = (int) (q_value("SELECT COUNT(*) FROM audit_logs WHERE action = 'found_report.expire' AND created_at BETWEEN ? AND ?", [$from . ' 00:00:00', $to . ' 23:59:59']) ?? 0);
 
     $match_rate   = $lost_total > 0 ? round($approved / $lost_total * 100, 1) : 0;
     $claim_rate   = $approved  > 0 ? round($released  / $approved  * 100, 1) : 0;

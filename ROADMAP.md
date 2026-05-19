@@ -106,8 +106,11 @@ Could improve:
 
 ### 3. Code health
 
-- [ ] Fix expired-count bug in `pages/admin.report.show.php`
-- [ ] Replace deprecated `fputcsv()` signature in `lib/export.php` for PHP 8.4
+- [x] Fix expired-count bug in `pages/admin.report.show.php` — now counts
+      `audit_logs` rows with `action='found_report.expire'` instead of
+      `found_reports.updated_at`, which auto-bumps on any later edit.
+- [x] Replace deprecated `fputcsv()` signature in `lib/export.php` for PHP 8.4
+      — escape arg is now `""` (RFC-4180), no more 8.4 deprecation warning.
 - [ ] Browser-verify every `[~]` above
 - [ ] Decide on test infrastructure — `lib/matching_test.php` is orphaned,
       not wired into any runner. Either delete it, or add a minimal harness

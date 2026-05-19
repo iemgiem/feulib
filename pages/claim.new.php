@@ -149,11 +149,9 @@ page_header('Submit your claim');
 
       <div class="form-group">
         <label for="id_proof" class="form-label form-label-required">Valid ID photo</label>
-        <?php if (!empty($errors['id_proof'])): ?>
-          <div class="form-error"><?= e($errors['id_proof'][0]) ?></div>
-        <?php endif; ?>
+        <?= field_error_html('id_proof', $errors) ?>
         <input type="file" id="id_proof" name="id_proof" accept="image/*"
-               class="form-control<?= !empty($errors['id_proof']) ? ' is-invalid' : '' ?>">
+               class="form-control<?= !empty($errors['id_proof']) ? ' is-invalid' : '' ?>"<?= field_aria('id_proof', $errors) ?>>
         <span class="form-hint">Accepted: JPG, PNG, WebP. Max 4 MB.</span>
       </div>
 

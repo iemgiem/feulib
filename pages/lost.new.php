@@ -194,7 +194,7 @@ page_header($page_title);
       <label class="field-label field-label-required" for="category">Category</label>
       <select id="category" name="category" class="field-select"
               data-rule="required|enum:<?= e(implode(',', array_keys($categories))) ?>"
-              required>
+              required<?= field_aria('category', $errors) ?>>
         <option value="">Choose one&hellip;</option>
         <?php foreach ($categories as $value => $label): ?>
           <option value="<?= e($value) ?>"<?= ($old['category'] ?? '') === $value ? ' selected' : '' ?>>
@@ -202,42 +202,34 @@ page_header($page_title);
           </option>
         <?php endforeach; ?>
       </select>
-      <?php if (isset($errors['category'])): ?>
-        <p class="field-error-text"><?= e($errors['category'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('category', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['color']) ? ' field-error' : '' ?>">
       <label class="field-label field-label-required" for="color">Primary color</label>
       <input type="text" id="color" name="color" class="field-input"
              value="<?= e($old['color'] ?? '') ?>"
-             data-rule="required|max:50" required maxlength="50">
+             data-rule="required|max:50" required maxlength="50"<?= field_aria('color', $errors) ?>>
       <p class="field-helper">Pick the most dominant color (e.g., navy, black, pink).</p>
-      <?php if (isset($errors['color'])): ?>
-        <p class="field-error-text"><?= e($errors['color'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('color', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['brand']) ? ' field-error' : '' ?>">
       <label class="field-label" for="brand">Brand or identifying marks <span class="text-muted text-sm">(optional)</span></label>
       <input type="text" id="brand" name="brand" class="field-input"
              value="<?= e($old['brand'] ?? '') ?>"
-             data-rule="max:100" maxlength="100">
+             data-rule="max:100" maxlength="100"<?= field_aria('brand', $errors) ?>>
       <p class="field-helper">E.g., "Jansport", "Apple", or any logo / scratch / sticker.</p>
-      <?php if (isset($errors['brand'])): ?>
-        <p class="field-error-text"><?= e($errors['brand'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('brand', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['description']) ? ' field-error' : '' ?>">
       <label class="field-label field-label-required" for="description">Description</label>
       <textarea id="description" name="description" class="field-textarea"
                 data-rule="required|min:10|max:1000" required maxlength="1000"
-                rows="4"><?= e($old['description'] ?? '') ?></textarea>
+                rows="4"<?= field_aria('description', $errors) ?>><?= e($old['description'] ?? '') ?></textarea>
       <p class="field-helper">Describe the item in detail. Mention any contents, distinctive marks, or wear &mdash; staff will use this to verify your ownership.</p>
-      <?php if (isset($errors['description'])): ?>
-        <p class="field-error-text"><?= e($errors['description'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('description', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['last_seen']) ? ' field-error' : '' ?>">
@@ -245,10 +237,8 @@ page_header($page_title);
       <input type="text" id="last_seen" name="last_seen" class="field-input"
              value="<?= e($old['last_seen'] ?? '') ?>"
              data-rule="required|max:255" required maxlength="255"
-             placeholder="e.g., 3rd floor study area">
-      <?php if (isset($errors['last_seen'])): ?>
-        <p class="field-error-text"><?= e($errors['last_seen'][0]) ?></p>
-      <?php endif; ?>
+             placeholder="e.g., 3rd floor study area"<?= field_aria('last_seen', $errors) ?>>
+      <?= field_error_html('last_seen', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['date_lost']) ? ' field-error' : '' ?>">
@@ -257,10 +247,8 @@ page_header($page_title);
              value="<?= e($old['date_lost'] ?? '') ?>"
              max="<?= e(date('Y-m-d')) ?>"
              min="<?= e(date('Y-m-d', strtotime('-1 year'))) ?>"
-             data-rule="required|date" required>
-      <?php if (isset($errors['date_lost'])): ?>
-        <p class="field-error-text"><?= e($errors['date_lost'][0]) ?></p>
-      <?php endif; ?>
+             data-rule="required|date" required<?= field_aria('date_lost', $errors) ?>>
+      <?= field_error_html('date_lost', $errors, 'field-error-text') ?>
     </div>
 
     <div class="photo-upload" data-max-bytes="<?= e((string) upload_max_bytes()) ?>">

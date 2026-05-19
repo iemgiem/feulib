@@ -150,12 +150,10 @@ page_header('System Settings');
       ?>
         <div class="form-group">
           <label for="<?= e($key) ?>" class="form-label"><?= e($label) ?></label>
-          <?php if (!empty($errors[$key])): ?>
-            <div class="form-error"><?= e($errors[$key][0]) ?></div>
-          <?php endif; ?>
+          <?= field_error_html($key, $errors) ?>
           <input type="number" id="<?= e($key) ?>" name="<?= e($key) ?>"
                  value="<?= e($_POST[$key] ?? $setting($key, $default)) ?>"
-                 min="0" max="100" class="form-control<?= !empty($errors[$key]) ? ' is-invalid' : '' ?>">
+                 min="0" max="100" class="form-control<?= !empty($errors[$key]) ? ' is-invalid' : '' ?>"<?= field_aria($key, $errors) ?>>
         </div>
       <?php endforeach; ?>
     </div>
@@ -165,12 +163,10 @@ page_header('System Settings');
         Match threshold
         <span class="form-hint">(minimum score to propose)</span>
       </label>
-      <?php if (!empty($errors['match_threshold'])): ?>
-        <div class="form-error"><?= e($errors['match_threshold'][0]) ?></div>
-      <?php endif; ?>
+      <?= field_error_html('match_threshold', $errors) ?>
       <input type="number" id="match_threshold" name="match_threshold"
              value="<?= e($_POST['match_threshold'] ?? $setting('match_threshold', '30')) ?>"
-             min="0" max="100" class="form-control<?= !empty($errors['match_threshold']) ? ' is-invalid' : '' ?>">
+             min="0" max="100" class="form-control<?= !empty($errors['match_threshold']) ? ' is-invalid' : '' ?>"<?= field_aria('match_threshold', $errors) ?>>
     </div>
 
     <button type="submit" class="btn btn-primary">Save weights</button>
@@ -191,13 +187,11 @@ page_header('System Settings');
 
     <div class="form-group" style="max-width: 200px;">
       <label for="holding_period_days" class="form-label">Days</label>
-      <?php if (!empty($errors['holding_period_days'])): ?>
-        <div class="form-error"><?= e($errors['holding_period_days'][0]) ?></div>
-      <?php endif; ?>
+      <?= field_error_html('holding_period_days', $errors) ?>
       <input type="number" id="holding_period_days" name="holding_period_days"
              value="<?= e($_POST['holding_period_days'] ?? $setting('holding_period_days', '365')) ?>"
              min="1" max="365"
-             class="form-control<?= !empty($errors['holding_period_days']) ? ' is-invalid' : '' ?>">
+             class="form-control<?= !empty($errors['holding_period_days']) ? ' is-invalid' : '' ?>"<?= field_aria('holding_period_days', $errors) ?>>
     </div>
 
     <button type="submit" class="btn btn-primary">Save holding period</button>

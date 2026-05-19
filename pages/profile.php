@@ -121,7 +121,8 @@ page_header('My Profile');
         <input type="text" id="full_name" name="full_name"
                value="<?= e($old['full_name'] ?? (string) $user['full_name']) ?>"
                class="form-control<?= !empty($errors['full_name']) ? ' is-invalid' : '' ?>"
-               maxlength="150" required>
+               maxlength="150" required<?= field_aria('full_name', $errors) ?>>
+        <?= field_error_html('full_name', $errors) ?>
       </div>
 
       <button type="submit" class="btn btn-primary">Update name</button>
@@ -152,22 +153,25 @@ page_header('My Profile');
         <label for="current_password" class="form-label form-label-required">Current password</label>
         <input type="password" id="current_password" name="current_password"
                class="form-control<?= !empty($errors['current_password']) ? ' is-invalid' : '' ?>"
-               autocomplete="current-password" required>
+               autocomplete="current-password" required<?= field_aria('current_password', $errors) ?>>
+        <?= field_error_html('current_password', $errors) ?>
       </div>
 
       <div class="form-group">
         <label for="new_password" class="form-label form-label-required">New password</label>
         <input type="password" id="new_password" name="new_password"
                class="form-control<?= !empty($errors['new_password']) ? ' is-invalid' : '' ?>"
-               autocomplete="new-password" minlength="8" required>
+               autocomplete="new-password" minlength="8" required<?= field_aria('new_password', $errors) ?>>
         <span class="form-hint">Minimum 8 characters.</span>
+        <?= field_error_html('new_password', $errors) ?>
       </div>
 
       <div class="form-group">
         <label for="confirm_password" class="form-label form-label-required">Confirm new password</label>
         <input type="password" id="confirm_password" name="confirm_password"
                class="form-control<?= !empty($errors['confirm_password']) ? ' is-invalid' : '' ?>"
-               autocomplete="new-password" minlength="8" required>
+               autocomplete="new-password" minlength="8" required<?= field_aria('confirm_password', $errors) ?>>
+        <?= field_error_html('confirm_password', $errors) ?>
       </div>
 
       <button type="submit" class="btn btn-primary">Change password</button>

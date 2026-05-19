@@ -91,10 +91,8 @@ auth_card_open(
              autocomplete="username"
              data-rule="required|email|max:255"
              autofocus
-             required>
-      <?php if (isset($errors['email'])): ?>
-        <p class="field-error-text"><?= e($errors['email'][0]) ?></p>
-      <?php endif; ?>
+             required<?= field_aria('email', $errors) ?>>
+      <?= field_error_html('email', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['password']) ? ' field-error' : '' ?>">
@@ -105,10 +103,8 @@ auth_card_open(
              class="field-input"
              autocomplete="current-password"
              data-rule="required|max:255"
-             required>
-      <?php if (isset($errors['password'])): ?>
-        <p class="field-error-text"><?= e($errors['password'][0]) ?></p>
-      <?php endif; ?>
+             required<?= field_aria('password', $errors) ?>>
+      <?= field_error_html('password', $errors, 'field-error-text') ?>
     </div>
 
     <button type="submit" class="btn btn-primary btn-block btn-lg">Sign in</button>

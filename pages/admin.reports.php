@@ -98,11 +98,9 @@ page_header('Reports');
 
       <div class="form-group">
         <label for="report_type" class="form-label form-label-required">Report type</label>
-        <?php if (!empty($errors['report_type'])): ?>
-          <div class="form-error"><?= e($errors['report_type'][0]) ?></div>
-        <?php endif; ?>
+        <?= field_error_html('report_type', $errors) ?>
         <select id="report_type" name="report_type"
-                class="form-control<?= !empty($errors['report_type']) ? ' is-invalid' : '' ?>">
+                class="form-control<?= !empty($errors['report_type']) ? ' is-invalid' : '' ?>"<?= field_aria('report_type', $errors) ?>>
           <option value="">Choose type&hellip;</option>
           <option value="operational_summary" <?= ($_POST['report_type'] ?? '') === 'operational_summary' ? 'selected' : '' ?>>
             Operational Summary
@@ -118,22 +116,18 @@ page_header('Reports');
 
       <div class="form-group">
         <label for="date_from" class="form-label form-label-required">From</label>
-        <?php if (!empty($errors['date_from'])): ?>
-          <div class="form-error"><?= e($errors['date_from'][0]) ?></div>
-        <?php endif; ?>
+        <?= field_error_html('date_from', $errors) ?>
         <input type="date" id="date_from" name="date_from"
                value="<?= e($_POST['date_from'] ?? date('Y-m-01')) ?>"
-               class="form-control<?= !empty($errors['date_from']) ? ' is-invalid' : '' ?>">
+               class="form-control<?= !empty($errors['date_from']) ? ' is-invalid' : '' ?>"<?= field_aria('date_from', $errors) ?>>
       </div>
 
       <div class="form-group">
         <label for="date_to" class="form-label form-label-required">To</label>
-        <?php if (!empty($errors['date_to'])): ?>
-          <div class="form-error"><?= e($errors['date_to'][0]) ?></div>
-        <?php endif; ?>
+        <?= field_error_html('date_to', $errors) ?>
         <input type="date" id="date_to" name="date_to"
                value="<?= e($_POST['date_to'] ?? date('Y-m-d')) ?>"
-               class="form-control<?= !empty($errors['date_to']) ? ' is-invalid' : '' ?>">
+               class="form-control<?= !empty($errors['date_to']) ? ' is-invalid' : '' ?>"<?= field_aria('date_to', $errors) ?>>
       </div>
 
       <button type="submit" class="btn btn-primary">Generate</button>

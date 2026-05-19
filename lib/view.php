@@ -359,3 +359,48 @@ function time_ago(?string $datetime): string
     if ($diff < 7 * 86400)         return floor($diff / 86400) . ' days ago';
     return date('M j, Y', $ts);
 }
+
+/**
+ * Form-error a11y helpers (Task 27, ACCESSIBILITY.md #1).
+ *
+ * Programmatically link a field-level error message to its input so screen
+ * readers announce the error when the input gets focus (WCAG 3.3.1, 1.3.1).
+ *
+ * Usage:
+ *
+ *   <input id="email" name="email"<?= field_aria('email', $errors) ?>>
+ *   <?= field_error_html('email', $errors) ?>
+ *
+ * `field_aria` returns ` aria-invalid="true" aria-describedby="<name>-error"`
+ * (leading space) when the field has an error, otherwise an empty string —
+ * drop it inside an input/textarea/select tag before the closing `>`.
+ *
+ * `field_error_html` returns a `<p id="<name>-error" class="…">…</p>` element
+ * with the matching id, or an empty string if no error. The CSS class
+ * defaults to `form-error`; pass `'field-error-text'` to match the
+ * `.field` / `.field-error` family of forms.
+ *
+ * Both helpers expect $errors to be an associative array keyed by field
+ * name, where each value is either a string or an array of strings (only
+ * the first message is rendered, matching the existing call sites).
+ */
+function field_aria(string $name, array $errors): string
+{
+    if (empty($errors[$name])) {
+        return '';
+    }
+    return ' aria-invalid="true" aria-describedby="' . e($name) . '-error"';
+}
+
+function field_error_html(string $name, array $errors, string $class = 'form-error'): string
+{
+    if (empty($errors[$name])) {
+        return '';
+    }
+    $msg = $errors[$name];
+    if (is_array($msg)) {
+        $msg = $msg[0] ?? '';
+    }
+    return '<p id="' . e($name) . '-error" class="' . e($class) . '">'
+         . e((string) $msg) . '</p>';
+}

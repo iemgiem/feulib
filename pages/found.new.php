@@ -199,7 +199,7 @@ page_header($page_title);
       <label class="field-label field-label-required" for="category">Category</label>
       <select id="category" name="category" class="field-select"
               data-rule="required|enum:<?= e(implode(',', array_keys($categories))) ?>"
-              required>
+              required<?= field_aria('category', $errors) ?>>
         <option value="">Choose one&hellip;</option>
         <?php foreach ($categories as $value => $label): ?>
           <option value="<?= e($value) ?>"<?= ($old['category'] ?? '') === $value ? ' selected' : '' ?>>
@@ -207,30 +207,24 @@ page_header($page_title);
           </option>
         <?php endforeach; ?>
       </select>
-      <?php if (isset($errors['category'])): ?>
-        <p class="field-error-text"><?= e($errors['category'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('category', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['color']) ? ' field-error' : '' ?>">
       <label class="field-label field-label-required" for="color">Primary color</label>
       <input type="text" id="color" name="color" class="field-input"
              value="<?= e($old['color'] ?? '') ?>"
-             data-rule="required|max:50" required maxlength="50">
-      <?php if (isset($errors['color'])): ?>
-        <p class="field-error-text"><?= e($errors['color'][0]) ?></p>
-      <?php endif; ?>
+             data-rule="required|max:50" required maxlength="50"<?= field_aria('color', $errors) ?>>
+      <?= field_error_html('color', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['brand']) ? ' field-error' : '' ?>">
       <label class="field-label" for="brand">Brand or identifying marks <span class="text-muted text-sm">(optional)</span></label>
       <input type="text" id="brand" name="brand" class="field-input"
              value="<?= e($old['brand'] ?? '') ?>"
-             data-rule="max:100" maxlength="100">
+             data-rule="max:100" maxlength="100"<?= field_aria('brand', $errors) ?>>
       <p class="field-helper">Stickers, logos, scratches, engravings &mdash; anything distinctive.</p>
-      <?php if (isset($errors['brand'])): ?>
-        <p class="field-error-text"><?= e($errors['brand'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('brand', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['description']) ? ' field-error' : '' ?>">
@@ -238,18 +232,16 @@ page_header($page_title);
       <textarea id="description" name="description" class="field-textarea"
                 data-rule="required|min:10|max:1000" required maxlength="1000"
                 rows="4"
-                placeholder="What's inside? What does it look like? What condition is it in?"><?= e($old['description'] ?? '') ?></textarea>
+                placeholder="What's inside? What does it look like? What condition is it in?"<?= field_aria('description', $errors) ?>><?= e($old['description'] ?? '') ?></textarea>
       <p class="field-helper">For verification at release time, note contents and any wear. Do NOT inspect wallets or sealed containers &mdash; describe them externally only.</p>
-      <?php if (isset($errors['description'])): ?>
-        <p class="field-error-text"><?= e($errors['description'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('description', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['storage_location_id']) ? ' field-error' : '' ?>">
       <label class="field-label field-label-required" for="storage_location_id">Storage location</label>
       <select id="storage_location_id" name="storage_location_id" class="field-select"
               data-rule="required|enum:<?= e(implode(',', $location_ids) ?: '0') ?>"
-              required <?= !$locations ? 'disabled' : '' ?>>
+              required <?= !$locations ? 'disabled' : '' ?><?= field_aria('storage_location_id', $errors) ?>>
         <option value="">Choose one&hellip;</option>
         <?php foreach ($locations as $loc): ?>
           <option value="<?= e((string) $loc['id']) ?>"
@@ -259,9 +251,7 @@ page_header($page_title);
         <?php endforeach; ?>
       </select>
       <p class="field-helper">Where will you physically put this item? Manage locations under Admin &rarr; Storage Locations.</p>
-      <?php if (isset($errors['storage_location_id'])): ?>
-        <p class="field-error-text"><?= e($errors['storage_location_id'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('storage_location_id', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['date_found']) ? ' field-error' : '' ?>">
@@ -270,10 +260,8 @@ page_header($page_title);
              value="<?= e($old['date_found'] ?? date('Y-m-d')) ?>"
              max="<?= e(date('Y-m-d')) ?>"
              min="<?= e(date('Y-m-d', strtotime('-1 year'))) ?>"
-             data-rule="required|date" required>
-      <?php if (isset($errors['date_found'])): ?>
-        <p class="field-error-text"><?= e($errors['date_found'][0]) ?></p>
-      <?php endif; ?>
+             data-rule="required|date" required<?= field_aria('date_found', $errors) ?>>
+      <?= field_error_html('date_found', $errors, 'field-error-text') ?>
     </div>
 
     <div class="photo-upload" data-max-bytes="<?= e((string) upload_max_bytes()) ?>">

@@ -288,21 +288,17 @@ page_header($claim['ref_number'], status_badge((string) $claim['status']));
 
           <div class="form-group">
             <label for="signature" class="form-label form-label-required">Claimant signature</label>
-            <?php if (!empty($errors['signature'])): ?>
-              <div class="form-error"><?= e($errors['signature'][0]) ?></div>
-            <?php endif; ?>
+            <?= field_error_html('signature', $errors) ?>
             <input type="file" id="signature" name="signature" accept="image/*"
-                   class="form-control<?= !empty($errors['signature']) ? ' is-invalid' : '' ?>">
+                   class="form-control<?= !empty($errors['signature']) ? ' is-invalid' : '' ?>"<?= field_aria('signature', $errors) ?>>
             <span class="form-hint">Upload a photo of the signed release form or use a signature-capture app.</span>
           </div>
 
           <div class="form-group">
             <label for="selfie" class="form-label form-label-required">Selfie with claimant</label>
-            <?php if (!empty($errors['selfie'])): ?>
-              <div class="form-error"><?= e($errors['selfie'][0]) ?></div>
-            <?php endif; ?>
+            <?= field_error_html('selfie', $errors) ?>
             <input type="file" id="selfie" name="selfie" accept="image/*"
-                   class="form-control<?= !empty($errors['selfie']) ? ' is-invalid' : '' ?>">
+                   class="form-control<?= !empty($errors['selfie']) ? ' is-invalid' : '' ?>"<?= field_aria('selfie', $errors) ?>>
             <span class="form-hint">Take a photo of the claimant holding the released item.</span>
           </div>
 

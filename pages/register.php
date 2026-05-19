@@ -132,15 +132,13 @@ auth_card_open(
              value="<?= e($old['full_name'] ?? '') ?>"
              autocomplete="name"
              data-rule="required|min:2|max:150"
-             autofocus required>
-      <?php if (isset($errors['full_name'])): ?>
-        <p class="field-error-text"><?= e($errors['full_name'][0]) ?></p>
-      <?php endif; ?>
+             autofocus required<?= field_aria('full_name', $errors) ?>>
+      <?= field_error_html('full_name', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['user_type']) ? ' field-error' : '' ?>">
       <span class="field-label field-label-required">I am a</span>
-      <div class="radio-group" role="radiogroup" aria-label="Account type">
+      <div class="radio-group" role="radiogroup" aria-label="Account type"<?= field_aria('user_type', $errors) ?>>
         <label class="radio-option">
           <input type="radio" name="user_type" value="student"
                  data-rule="required|enum:student,faculty"
@@ -153,9 +151,7 @@ auth_card_open(
           <span>Faculty</span>
         </label>
       </div>
-      <?php if (isset($errors['user_type'])): ?>
-        <p class="field-error-text"><?= e($errors['user_type'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('user_type', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['id_number']) ? ' field-error' : '' ?>">
@@ -163,11 +159,9 @@ auth_card_open(
       <input type="text" id="id_number" name="id_number" class="field-input"
              value="<?= e($old['id_number'] ?? '') ?>"
              data-rule="required|max:50"
-             required>
+             required<?= field_aria('id_number', $errors) ?>>
       <p class="field-helper">Format: <code>2024-00001</code> for students, <code>2020-EMP-001</code> for faculty.</p>
-      <?php if (isset($errors['id_number'])): ?>
-        <p class="field-error-text"><?= e($errors['id_number'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('id_number', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['email']) ? ' field-error' : '' ?>">
@@ -176,10 +170,8 @@ auth_card_open(
              value="<?= e($old['email'] ?? '') ?>"
              autocomplete="email"
              data-rule="required|email|max:255"
-             required>
-      <?php if (isset($errors['email'])): ?>
-        <p class="field-error-text"><?= e($errors['email'][0]) ?></p>
-      <?php endif; ?>
+             required<?= field_aria('email', $errors) ?>>
+      <?= field_error_html('email', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field<?= isset($errors['password']) ? ' field-error' : '' ?>">
@@ -187,11 +179,9 @@ auth_card_open(
       <input type="password" id="password" name="password" class="field-input"
              autocomplete="new-password"
              data-rule="required|min:8|max:255|confirmed"
-             required>
+             required<?= field_aria('password', $errors) ?>>
       <p class="field-helper">At least 8 characters.</p>
-      <?php if (isset($errors['password'])): ?>
-        <p class="field-error-text"><?= e($errors['password'][0]) ?></p>
-      <?php endif; ?>
+      <?= field_error_html('password', $errors, 'field-error-text') ?>
     </div>
 
     <div class="field">

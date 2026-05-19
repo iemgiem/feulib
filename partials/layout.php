@@ -45,6 +45,7 @@ function layout_open(string $page_title): void
     require __DIR__ . '/header.php';
     require __DIR__ . '/sidebar.php';
     ?>
+    <div class="app-sidebar-backdrop" hidden></div>
     <main class="app-main" role="main" id="main-content" tabindex="-1">
       <div class="app-content">
 <?php
@@ -105,6 +106,7 @@ function layout_close(): void
   <script src="<?= e(asset('js/photo-upload.js')) ?>" defer></script>
   <script src="<?= e(asset('js/notifications.js')) ?>" defer></script>
   <script src="<?= e(asset('js/modal.js')) ?>" defer></script>
+  <script src="<?= e(asset('js/sidebar-drawer.js')) ?>" defer></script>
 </body>
 </html>
 <?php

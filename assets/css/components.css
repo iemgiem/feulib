@@ -550,6 +550,99 @@
   text-align: center;
 }
 
+/* ----- Hamburger + drawer (hidden on desktop, see media query below) ----- */
+
+.app-header-hamburger {
+  display: none;          /* shown at <=1024px */
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--shell-header-fg);
+  cursor: pointer;
+}
+.app-header-hamburger:hover { background: rgba(255, 255, 255, 0.12); }
+
+.app-sidebar-close {
+  display: none;          /* shown at <=1024px */
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.app-sidebar-close:hover { background: var(--color-bg-hover); }
+
+.app-sidebar-backdrop {
+  display: none;          /* shown at <=1024px, when body.sidebar-open */
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--color-overlay);
+}
+
+/* ----- Responsive shell: hamburger sheet ≤1024px (ACCESSIBILITY.md #6) ----- */
+
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
+  }
+
+  .app-header { padding: 0 var(--space-4); }
+  .app-header-hamburger { display: inline-flex; }
+
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: min(280px, 84vw);
+    z-index: var(--z-modal);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    transition: transform var(--duration-normal) var(--easing-out);
+    padding-top: var(--space-6);  /* room for the close button */
+  }
+
+  .app-sidebar-close { display: inline-flex; }
+
+  body.sidebar-open .app-sidebar      { transform: translateX(0); }
+  body.sidebar-open .app-sidebar-backdrop { display: block; }
+  body.sidebar-open { overflow: hidden; }
+
+  .app-main { padding: var(--space-5) var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  .app-header-brand {
+    font-size: var(--font-size-sm);
+    /* Truncate gracefully on the narrowest screens — full label still in <title>. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app-header-user span:first-child { display: none; }  /* hide name; role pill stays */
+  .app-header-logout { padding: 0 var(--space-2); }
+  .app-main { padding: var(--space-4) var(--space-3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar { transition: none; }
+}
+
 /* ----------------------------------------------------------------------------
    Breadcrumb + Page header strip
    ---------------------------------------------------------------------------- */

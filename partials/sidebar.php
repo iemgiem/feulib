@@ -8,7 +8,10 @@ $current_token = (string) ($_GET['p'] ?? '');
 $role          = user_role() ?? 'user';
 $items         = sidebar_items($role);
 ?>
-<aside class="app-sidebar" aria-label="Primary navigation">
+<aside class="app-sidebar" id="app-sidebar" aria-label="Primary navigation">
+  <button type="button" class="app-sidebar-close" aria-label="Close navigation">
+    <span aria-hidden="true">&times;</span>
+  </button>
   <nav>
     <?php
     $in_section = false;

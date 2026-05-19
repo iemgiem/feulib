@@ -1015,6 +1015,14 @@ details.expandable > summary::after {
 
 details.expandable[open] > summary::after { content: "\2212"; } /* minus */
 
+/* WCAG 2.4.7 — make summary's keyboard focus visible (browser defaults
+   vary; pin it to the same token used elsewhere in the app). */
+summary:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 
 /* ----------------------------------------------------------------------------
    Empty state — used by list/table widgets when there's nothing to show

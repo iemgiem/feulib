@@ -185,7 +185,7 @@ Each function computes a weighted similarity score for every candidate pair. Wei
 
 Pairs scoring ≥ threshold are inserted into `matches` with status `pending` and their per-factor breakdown in `factors_json`. Weights must sum to 100; enforce this in `admin.settings.php` before saving.
 
-Run the unit tests: `php lib/matching_test.php`.
+Diagnostic: `php db/match_debug.php` prints the per-factor score for every lost × found pair in the database, against the current weights and threshold. Read-only, no assertions — use it to eyeball the effect of a weight change before saving it.
 
 ---
 

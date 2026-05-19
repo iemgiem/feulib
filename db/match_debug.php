@@ -2,29 +2,26 @@
 declare(strict_types=1);
 
 /**
- * CLI test harness for the matching service.
+ * Matching algorithm diagnostic — prints a scoring table for every
+ * lost × found pair currently in the database. Not a test (no assertions,
+ * no pass/fail); a visual tuning aid for the weights / threshold knobs
+ * exposed under Admin → Settings → Match Scoring.
  *
- *   php lib/matching_test.php
+ *   php db/match_debug.php
  *
- * Loads every found_report + every lost_report in the database, runs the
- * scoring algorithm against each pair, and prints a breakdown table. Nothing
- * is written to the database — this is purely for tuning weights/threshold
- * without polluting state.
+ * Read-only — nothing is written to the database or the audit log.
  *
- * Run after `SOURCE seed.sql` to verify the seeded LFMS-2026-F-00001 ↔
- * LFMS-2026-00001 pair still hits the configured threshold after a weight
- * change in Admin → Settings → Match Scoring.
+ * Typical use: after a weight change, re-run against the seed dataset
+ * and confirm the seeded LFMS-2026-F-00001 ↔ LFMS-2026-00001 pair still
+ * lands at or above the threshold.
  */
 
 if (PHP_SAPI !== 'cli') {
-    fwrite(STDERR, "matching_test.php must be run from the command line.\n");
+    fwrite(STDERR, "match_debug.php must be run from the command line.\n");
     exit(1);
 }
 
-// session_boot() inside bootstrap.php works fine in CLI (cookie params are
-// no-ops; PHP falls back to file-based storage). We don't depend on session
-// state here — generate_candidates() isn't called from this script.
-require __DIR__ . '/bootstrap.php';
+require __DIR__ . '/../lib/bootstrap.php';
 
 $found_rows = q_all(
     'SELECT f.*, sl.description AS storage_description
@@ -37,7 +34,7 @@ $lost_rows = q_all('SELECT * FROM lost_reports ORDER BY id');
 $weights   = match_weights();
 $threshold = match_threshold();
 
-echo "FEU LFMS — matching algorithm test harness\n";
+echo "FEU LFMS — matching algorithm diagnostic\n";
 echo str_repeat('=', 78), "\n";
 echo "Weights:    ", json_encode($weights), "\n";
 echo "Threshold:  ", $threshold, "\n";

@@ -137,7 +137,6 @@ feulib/
 │   ├── redirect.php        # go(), back()
 │   ├── upload.php          # upload_store(): validates MIME/size, saves to assets/uploads/
 │   ├── matching.php        # generate_candidates_for_lost/found() scoring algorithm
-│   ├── matching_test.php   # Unit tests for the matching algorithm
 │   ├── validate.php        # Server-side validation rules (mirrored in assets/js/validate.js)
 │   ├── sanitize.php        # e() HTML escape, clean() strip-tags
 │   ├── its.php             # ITS (Integrated Tertiary System) integration — fetch + sync
@@ -178,6 +177,8 @@ feulib/
     ├── seed.sql             # Demo data
     ├── expire_items.php     # Daily CLI expiry job
     ├── sync_its.php         # Nightly CLI ITS roster sync
+    ├── its_probe.php        # Read-only smoke test for the configured ITS endpoint
+    ├── match_debug.php      # Diagnostic — prints scoring breakdown for every lost x found pair
     ├── hash_passwords.php   # bcrypt hash utility
     ├── migrations/          # One-off SQL files to apply to existing databases
     └── README.md            # Database setup details
@@ -230,13 +231,18 @@ The local `its_users` table is populated by the first sync. If you imported `db/
 
 ---
 
-## Running the matching tests
+## Tuning the matching algorithm
 
 ```sh
-php lib/matching_test.php
+php db/match_debug.php
 ```
 
-The tests cover the scoring algorithm in `lib/matching.php` — category, color, location, date, and description weights — and verify that the combined score respects the threshold setting.
+Prints a per-pair scoring breakdown (category, color, location, date,
+description) for every lost × found report currently in the database,
+plus the configured weights and threshold. Read-only — useful for sanity
+checking after changing weights under **Admin → Settings → Match
+Scoring**. Not a test runner: there are no assertions, so the exit code
+is always `0` unless PHP itself blows up.
 
 ---
 

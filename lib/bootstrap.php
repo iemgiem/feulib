@@ -84,6 +84,7 @@ require_once __DIR__ . '/export.php';     // pure functions, no deps
 require_once __DIR__ . '/redirect.php';   // depends on flash
 require_once __DIR__ . '/view.php';       // url(), asset(), auth_card_open/close
 require_once __DIR__ . '/../partials/layout.php'; // layout_open/close, breadcrumb, page_header, sidebar_items
+require_once __DIR__ . '/../partials/modal.php';  // modal_open/close, modal_footer_open/close
 
 // ---------------------------------------------------------------------------
 // 4. Start the session (must happen before any output)

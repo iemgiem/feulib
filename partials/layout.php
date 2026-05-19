@@ -37,6 +37,9 @@ function layout_open(string $page_title): void
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
+  <!-- Polite live region for transient announcements (notification poll,
+       modal results, etc.). Visually hidden; screen-readers announce changes. -->
+  <div id="toast-region" class="sr-only" aria-live="polite" aria-atomic="false"></div>
   <div class="app-shell">
 <?php
     require __DIR__ . '/header.php';
@@ -101,6 +104,7 @@ function layout_close(): void
   <script src="<?= e(asset('js/validate.js')) ?>" defer></script>
   <script src="<?= e(asset('js/photo-upload.js')) ?>" defer></script>
   <script src="<?= e(asset('js/notifications.js')) ?>" defer></script>
+  <script src="<?= e(asset('js/modal.js')) ?>" defer></script>
 </body>
 </html>
 <?php

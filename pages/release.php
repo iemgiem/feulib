@@ -282,7 +282,7 @@ page_header($claim['ref_number'], status_badge((string) $claim['status']));
           before handing over the item.
         </p>
 
-        <form method="POST" enctype="multipart/form-data" class="stack-4">
+        <form method="POST" enctype="multipart/form-data" class="stack-4" id="release-form">
           <?= csrf_field() ?>
           <input type="hidden" name="claim" value="<?= e((string) $claim_id) ?>">
 
@@ -312,10 +312,51 @@ page_header($claim['ref_number'], status_badge((string) $claim['status']));
                       placeholder="Any remarks about the release…"><?= e($_POST['notes'] ?? '') ?></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary"
-                  onclick="return confirm('Confirm release of this item to the claimant?')">
+          <button type="button" class="btn btn-primary"
+                  data-modal-open="release-confirm-modal">
             Confirm release
           </button>
+
+          <!-- Hold-to-confirm modal (Task 27) — final guard before the release
+               is recorded. The Confirm button must be held 1.5 s; on completion
+               modal.js calls form.requestSubmit() which fires native validation
+               on the signature + selfie inputs above. -->
+          <?php
+            modal_open('release-confirm-modal', 'Confirm item release', [
+                'role'        => 'alertdialog',
+                'describedby' => 'release-confirm-desc',
+            ]);
+          ?>
+            <p id="release-confirm-desc">
+              You are about to release this item to
+              <strong><?= e((string) $claim['claimant_name']) ?></strong>.
+              A signature and selfie will be saved permanently, and the
+              reports will move to <strong>Released</strong>.
+              This action cannot be undone.
+            </p>
+            <dl class="detail-grid text-sm">
+              <dt>Claim</dt>
+              <dd><?= e((string) $claim['ref_number']) ?></dd>
+              <dt>Lost report</dt>
+              <dd><?= e((string) $claim['lost_ref']) ?></dd>
+              <dt>Found item</dt>
+              <dd><?= e((string) $claim['found_ref']) ?></dd>
+            </dl>
+            <p class="text-sm text-muted">
+              Hold the confirm button for 1.5&nbsp;seconds to prevent accidental release.
+            </p>
+          <?php
+            modal_footer_open();
+          ?>
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+            <button type="button" class="btn btn-primary btn-hold" data-modal-hold="1500">
+              <span class="modal-hold-progress" aria-hidden="true"></span>
+              Hold to release
+            </button>
+          <?php
+            modal_footer_close();
+            modal_close();
+          ?>
         </form>
       </section>
     <?php elseif ($claim['status'] === 'pending_user_action'): ?>

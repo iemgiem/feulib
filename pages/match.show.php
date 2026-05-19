@@ -91,6 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'needs_info' && $notes === '') {
         $errors[] = 'Please describe what additional information is needed.';
     }
+    if ($action === 'reject' && $notes === '') {
+        $errors[] = 'Please provide a reason for rejecting this match.';
+    }
 
     if (!$errors) {
         $new_status = match ($action) {
@@ -414,11 +417,47 @@ page_header(
                 onclick="return document.getElementById('review_notes').value.trim() !== '' || (alert('Please enter notes before marking as Needs Info.'), false)">
           Needs info
         </button>
-        <button type="submit" name="action" value="reject" class="btn btn-danger"
-                onclick="return confirm('Reject this match? The reports will remain open for future matching.')">
+        <button type="button" class="btn btn-danger"
+                data-modal-open="reject-match-modal">
           Reject match
         </button>
       </div>
+    </form>
+
+    <!-- Reject confirmation modal (Task 27) — captures a required reason
+         before submitting. Lives outside the main review form so the
+         reason field doesn't clash with the inline review_notes textarea. -->
+    <form method="POST" id="reject-match-form">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="reject">
+      <?php
+        modal_open('reject-match-modal', 'Reject this match?', [
+            'role'        => 'alertdialog',
+            'size'        => 'sm',
+            'describedby' => 'reject-match-desc',
+        ]);
+      ?>
+        <p id="reject-match-desc" class="text-muted">
+          The lost and found reports will remain open and may be matched again later.
+          Please tell other staff why this pairing was wrong.
+        </p>
+        <div class="form-group">
+          <label for="reject_reason" class="form-label form-label-required">
+            Reason for rejection
+          </label>
+          <textarea id="reject_reason" name="review_notes" rows="4" required
+                    class="form-control"
+                    placeholder="e.g. Different brand and the colour photos clearly don't match."></textarea>
+        </div>
+      <?php
+        modal_footer_open();
+      ?>
+        <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-danger">Reject match</button>
+      <?php
+        modal_footer_close();
+        modal_close();
+      ?>
     </form>
   </section>
 <?php endif; ?>

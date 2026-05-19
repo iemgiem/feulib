@@ -100,7 +100,7 @@ Should fix:
 
 Could improve:
 - [~] #8 Photo `alt` text differentiation (branch `a11y-polish`)
-- [ ] #9 Page titles differentiate beyond "FEU LFMS"
+- [~] #9 Page titles differentiate beyond "FEU LFMS" (branch `a11y-polish`)
 - [ ] #10 `<details>` keyboard / focus check
 - [x] #11 Notification bell `aria-live` (subsumed by #3 toast region)
 

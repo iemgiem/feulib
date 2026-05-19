@@ -161,7 +161,8 @@ if (($_GET['format'] ?? '') === 'csv') {
     });
 }
 
-layout_open($title_map[$type] ?? ucwords(str_replace('_', ' ', $type)));
+$title_base = $title_map[$type] ?? ucwords(str_replace('_', ' ', $type));
+layout_open($from !== '' && $to !== '' ? $title_base . ' — ' . $from . ' to ' . $to : $title_base);
 
 breadcrumb([
     ['Dashboard', url('/index.php?p=admin.dashboard')],

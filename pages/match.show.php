@@ -216,7 +216,7 @@ if (!empty($match['reviewed_by_account_id'])) {
 // ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
-layout_open('Match #' . $id);
+layout_open('Match ' . $match['lost_ref'] . ' / ' . $match['found_ref']);
 
 $success = flash_get('success');
 if ($success) {

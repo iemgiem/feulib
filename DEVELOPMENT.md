@@ -185,7 +185,7 @@ Each function computes a weighted similarity score for every candidate pair. Wei
 
 Pairs scoring ≥ threshold are inserted into `matches` with status `pending` and their per-factor breakdown in `factors_json`. Weights must sum to 100; enforce this in `admin.settings.php` before saving.
 
-Run the unit tests: `php lib/matching_test.php`.
+Diagnostic: `php db/match_debug.php` prints the per-factor score for every lost × found pair in the database, against the current weights and threshold. Read-only, no assertions — use it to eyeball the effect of a weight change before saving it.
 
 ---
 
@@ -334,4 +334,172 @@ its_last_sync_at():             ?string // MAX(last_synced_at).
 schtasks /Create /SC DAILY /TN "LFMS Sync ITS" /TR "php C:\xampp\htdocs\feulib\db\sync_its.php" /ST 02:00
 ```
 
+**CLI probe**: `db/its_probe.php` hits the configured endpoint(s), validates
+the response shape, and prints a sample normalised row. Read-only — no DB
+writes, no audit row. Run this whenever the ITS URL or auth value changes,
+**before** scheduling or re-running the sync.
+
+```sh
+php db/its_probe.php             # probe both endpoints
+php db/its_probe.php --students  # one at a time
+```
+
+The probe also flags when `its.auth_value` is still the shipped
+`dev-token-change-me-before-production` placeholder.
+
 **Schema**: the `its_users` table lives in `db/schema.sql`. If you upgraded from a pre-feature database, apply `db/migrations/2026_its_users.sql` once.
+
+---
+
+## Scheduled tasks (Windows host)
+
+LFMS has two recurring jobs. Both are plain `php script.php` invocations, both
+exit non-zero on failure, and both write to the audit log so a missed run is
+visible in the admin reports. Schedule via Windows Task Scheduler.
+
+Adjust the path (`C:\xampp\htdocs\feulib`) to match the install location.
+
+### Nightly ITS roster sync — `db/sync_its.php`
+
+Pulls students + staff from ITS into `its_users`. Soft-deactivates anyone the
+API no longer returns. One `its.sync` audit row per successful run,
+`its.sync_failed` on error.
+
+```sh
+schtasks /Create /SC DAILY /TN "LFMS Sync ITS" ^
+         /TR "php C:\xampp\htdocs\feulib\db\sync_its.php" ^
+         /ST 02:00
+```
+
+### Daily expire job — `db/expire_items.php`
+
+Marks `found_reports` past the configured holding period (default 365 days) as
+`expired`, auto-rejecting any pending matches. Items in status `matched` are
+left alone — staff must rule on the in-flight match first.
+
+```sh
+schtasks /Create /SC WEEKLY ^
+         /D MON,TUE,WED,THU,FRI,SAT ^
+         /TN "LFMS Expire Items" ^
+         /TR "php C:\xampp\htdocs\feulib\db\expire_items.php" ^
+         /ST 12:00
+```
+
+Mon–Sat reflects FEU library opening days; adjust if your branch differs.
+Use `php db/expire_items.php --dry` from a normal shell first to preview what
+the next run will touch.
+
+### Verifying a scheduled task
+
+```sh
+schtasks /Query /TN "LFMS Sync ITS" /V /FO LIST
+schtasks /Run   /TN "LFMS Sync ITS"          :: trigger immediately for a smoke test
+schtasks /Delete /TN "LFMS Sync ITS" /F      :: remove
+```
+
+After a manual run, confirm the audit log picked it up:
+
+```sql
+SELECT action, created_at, payload_json
+  FROM audit_logs
+ WHERE action IN ('its.sync', 'its.sync_failed', 'found_report.expire')
+ ORDER BY id DESC LIMIT 10;
+```
+
+---
+
+## Production config checklist
+
+Before pointing real traffic at this instance, walk `config.php` top-to-bottom
+and flip each of these. None of them have safe production defaults — XAMPP's
+defaults are tuned for local development.
+
+- [ ] `app.env` → `'production'`
+- [ ] `app.base_url` → the real HTTPS URL (e.g. `https://lfms.feu.edu.ph`)
+- [ ] `app.base_path` → matches the URL path, or `''` if served at docroot
+- [ ] `db.user`, `db.pass` → a dedicated MySQL account, **not** `root` with
+      an empty password. Grant only `SELECT, INSERT, UPDATE, DELETE` on the
+      `lfms` database. Schema changes should require a separate admin
+      credential the application never sees.
+- [ ] `session.cookie_secure` → `true` (requires HTTPS to be live first)
+- [ ] `upload.storage_path` → on a writable disk with enough headroom; the
+      `assets/uploads/.htaccess` deny rule must survive any reverse-proxy
+      rewrite so files are only served via `pages/serve_upload.php`
+- [ ] `its.endpoints.students`, `its.endpoints.staff` → real ITS URLs, not
+      the bundled `api.its_mock`
+- [ ] `its.auth_value` → real bearer token / API key, rotated off
+      `dev-token-change-me-before-production`
+- [ ] `its.verify_ssl` → `true` (only flip false for local dev against the
+      mock)
+
+Sanity checks once deployed:
+
+```sh
+php -r "print_r((require 'config.php')['app']);"   :: app.env = 'production' ?
+curl -I https://your-host/feulib/                   :: HTTP/2 200, Strict-Transport-Security set ?
+```
+
+Try logging in over HTTP — it should redirect or fail. If a session cookie
+arrives without the `Secure` flag, `cookie_secure` is still `false`.
+
+---
+
+## MySQL backup and restore
+
+The application has no built-in backup feature; this is a Windows
+Task-Scheduler + `mysqldump` recipe. Keep at least seven daily snapshots
+plus one weekly snapshot offsite (different physical drive, ideally a
+different machine).
+
+### Daily dump
+
+Single-transaction so the dump is consistent without locking writes. Routine
+on `lfms` is well under a minute on the expected dataset size.
+
+```sh
+mysqldump --single-transaction --quick --default-character-set=utf8mb4 ^
+          -u lfms_backup -p<password> ^
+          --routines --triggers ^
+          lfms > C:\lfms-backups\lfms-%date:~-4%-%date:~3,2%-%date:~0,2%.sql
+```
+
+Wire it into Task Scheduler:
+
+```sh
+schtasks /Create /SC DAILY /TN "LFMS Backup" ^
+         /TR "C:\path\to\backup-lfms.cmd" ^
+         /ST 01:00
+```
+
+Create a dedicated MySQL user with the minimum privileges needed:
+
+```sql
+CREATE USER 'lfms_backup'@'localhost' IDENTIFIED BY '<password>';
+GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON lfms.* TO 'lfms_backup'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### Restore — verify the backup actually works
+
+A backup nobody has restored is a folder of files. Once a quarter, restore
+the latest dump into a scratch database and run the app against it:
+
+```sh
+mysql -u root -p -e "CREATE DATABASE lfms_restore_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p lfms_restore_test < C:\lfms-backups\lfms-2026-05-19.sql
+```
+
+Point a throwaway `config.php` at `lfms_restore_test`, open the dashboard,
+confirm counts match what the source database shows. Drop the scratch DB
+when done.
+
+### What also needs backing up
+
+`mysqldump` covers the database, not the filesystem. Add these to your
+backup set:
+
+- `assets/uploads/` — every uploaded photo / ID scan / signature / selfie.
+  Items lose their evidence if this folder is lost, even with the DB intact.
+- `config.php` — small, but the only copy of your production credentials.
+  Store this separately from the dumps (a password manager attachment is
+  fine; a flat `config.bak` next to the SQL dump is not).

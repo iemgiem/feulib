@@ -112,9 +112,11 @@ Could improve:
 - [x] Replace deprecated `fputcsv()` signature in `lib/export.php` for PHP 8.4
       — escape arg is now `""` (RFC-4180), no more 8.4 deprecation warning.
 - [ ] Browser-verify every `[~]` above
-- [ ] Decide on test infrastructure — `lib/matching_test.php` is orphaned,
-      not wired into any runner. Either delete it, or add a minimal harness
-      and a CI hook.
+- [x] Decide on test infrastructure — renamed `lib/matching_test.php` to
+      `db/match_debug.php` and reframed as a tuning diagnostic (no
+      assertions, no pass/fail). README, DEVELOPMENT, and CLAUDE updated
+      to stop calling it tests. A real test runner is still not wired up
+      and remains out of scope for this phase.
 
 ### 4. Operations & deployment
 

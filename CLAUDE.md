@@ -31,7 +31,8 @@ lands — checkboxes are the contract between sessions.
 - Pages live in `pages/`, partials in `partials/`, assets under
   `assets/{css,js,uploads}`. The accessibility audit lives in
   `ACCESSIBILITY.md`; the developer guide in `DEVELOPMENT.md`.
-- No test runner is wired up. `lib/matching_test.php` is orphaned.
+- No test runner is wired up. `db/match_debug.php` is a tuning diagnostic,
+  not a test (no assertions, no pass/fail).
 
 ## Environment notes
 

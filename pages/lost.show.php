@@ -86,7 +86,7 @@ page_header($report['ref_number'], $actions);
       <?php $first_photo = $photos[0]; ?>
       <div class="detail-photo">
         <img src="<?= e(upload_url($first_photo)) ?>"
-             alt="Photo of the lost item">
+             alt="<?= e($category_label . ', ' . (string) $report['color']) ?>">
       </div>
     <?php endif; ?>
 

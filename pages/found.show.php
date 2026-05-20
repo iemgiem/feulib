@@ -92,7 +92,8 @@ page_header($report['ref_number'], $actions);
       <?php if ($photos): ?>
         <?php $first_photo = $photos[0]; ?>
         <div class="detail-photo">
-          <img src="<?= e(upload_url($first_photo)) ?>" alt="Photo of the found item">
+          <img src="<?= e(upload_url($first_photo)) ?>"
+               alt="<?= e(category_label((string) $report['category']) . ', ' . (string) $report['color']) ?>">
         </div>
       <?php endif; ?>
 

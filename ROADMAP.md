@@ -43,23 +43,27 @@ The project ships when ALL of the following are true:
 
 ## Next up (pickup point for the next session)
 
+All of §1 and §2 is now code-complete and consolidated on the `integration`
+branch (`signature-selfie` + `a11y-polish` + `ops-docs` merged with no
+conflicts). Nothing in §1/§2 remains to *build* — the gates now are
+browser verification and operations.
+
 **Recommended order, smallest-risk first:**
 
-1. **Browser-verify `task27modal` commits** (`3014fa1` → `b308ea0`). Five
-   commits of UI work — modal focus trap, hold-to-confirm, drawer with focus
-   trap, aria-describedby, aria-sort — none of it tested in a real browser.
-   The two highest-risk paths to exercise: rejecting a match (modal flow) and
-   releasing an item (hold-to-confirm).
-2. **Fix the two code-review nits** — expired count in
-   `pages/admin.report.show.php` and the PHP-8.4 `fputcsv` deprecation in
-   `lib/export.php`. Both are server-side, low-risk, ~15 min combined.
-3. **Build #5 — signature pad + selfie capture.** Biggest remaining feature
-   and the only thing blocking brief sign-off. Start a fresh branch off
-   `task27modal` once it merges.
-4. **Could-improve items** (#8 alt text, #9 page titles, #10 `<details>`
-   focus). Each is a one-commit pass.
-5. **Operations / deployment** — real ITS endpoint, scheduled tasks, backup
-   procedure, HTTPS.
+1. **Browser-verify the `[~]` items.** `VERIFY.md` covers the original
+   `task27modal` UI work (modal focus trap, hold-to-confirm, toast region,
+   aria-sort, hamburger drawer). Extend it to the newly merged work: the
+   signature pad + selfie capture on the release flow (#5), and the
+   a11y-polish pass (#8 alt text, #9 page titles, #10 `<details>` focus).
+   None of it has run in a real browser.
+2. **Operations / deployment (§4).** All nine items are environment-bound —
+   real ITS endpoint + rotated credentials, scheduled tasks on the Windows
+   host, MySQL backup, HTTPS, prod config. Needs the target machine.
+3. **Merge `integration` → `main`** once verification passes and the `[~]`
+   markers below flip to `[x]`.
+
+The two code-review nits (expired count, `fputcsv`) and the test-infra
+decision are already done — see §3.
 
 ---
 

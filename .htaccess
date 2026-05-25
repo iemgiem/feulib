@@ -1,0 +1,64 @@
+# FEU LFMS — Root Apache configuration.
+#
+# Sections:
+#   1. Authorization header forwarding (ITS integration)
+#   2. Directory listing disabled
+#   3. Block direct access to PHP source directories
+#   4. Security response headers
+
+# =============================================================================
+# 1. Authorization header forwarding
+#    mod_php on Apache (XAMPP default) strips `Authorization` before it reaches
+#    PHP's $_SERVER. These two forms cover mod_php + PHP-FPM/CGI deployments.
+# =============================================================================
+
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} ^(.+)$
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
+
+# =============================================================================
+# 2. Disable directory listings project-wide
+# =============================================================================
+
+Options -Indexes
+
+
+# =============================================================================
+# 3. Block direct HTTP access to PHP source directories.
+#    <DirectoryMatch> is NOT valid inside .htaccess — source-dir protection is
+#    handled by per-directory .htaccess files in lib/, pages/, partials/, db/.
+#    Only config files are blocked here (FilesMatch is valid in .htaccess).
+# =============================================================================
+
+# Block config files wherever they appear
+<FilesMatch "^(config|config\.example)\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+
+# =============================================================================
+# 4. Security response headers (belt-and-suspenders alongside bootstrap.php)
+#    Requires mod_headers. On XAMPP: uncomment `LoadModule headers_module` in
+#    httpd.conf if these have no effect.
+# =============================================================================
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    # Uncomment when HTTPS is confirmed on the production host:
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>

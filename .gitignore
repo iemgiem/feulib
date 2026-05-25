@@ -1,0 +1,24 @@
+# ── User uploads ────────────────────────────────────────────────────────────
+# Keep the directory structure so the app works on a fresh clone,
+# but do not commit actual uploaded images / signatures / selfies.
+assets/uploads/found_report/*
+assets/uploads/claim_ticket/*
+!assets/uploads/found_report/.gitkeep
+!assets/uploads/claim_ticket/.gitkeep
+
+# ── Claude Code internals ────────────────────────────────────────────────────
+.claude/
+skills-lock.json
+
+# ── OS / editor ─────────────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── PHP logs ─────────────────────────────────────────────────────────────────
+*.log
+error_log

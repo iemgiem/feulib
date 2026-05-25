@@ -1,0 +1,10 @@
+# Block all direct HTTP access — pages/ files are PHP includes dispatched
+# through index.php. Direct access bypasses auth + role gates.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+Options -Indexes

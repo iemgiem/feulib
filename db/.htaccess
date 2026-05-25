@@ -1,0 +1,11 @@
+# Block all direct HTTP access — db/ contains schema, migrations, and CLI
+# scripts. None of these are public resources; direct access could expose
+# schema details or run unintended CLI scripts via the browser.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
+Options -Indexes

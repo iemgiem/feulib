@@ -133,7 +133,10 @@ if (cfg('app.env') === 'production') {
 // ---------------------------------------------------------------------------
 
 set_exception_handler(function (\Throwable $e): void {
-    if (cfg('app.env') === 'development') {
+    // Temporary debug mode — remove after diagnosing Railway deploy issue
+    $show_debug = cfg('app.env') === 'development' || isset($_GET['_debug_deploy']);
+
+    if ($show_debug) {
         http_response_code(500);
         header('Content-Type: text/html; charset=utf-8');
         echo '<h1>Uncaught ' . htmlspecialchars(get_class($e)) . '</h1>';

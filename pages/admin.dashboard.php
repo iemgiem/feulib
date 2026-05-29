@@ -29,6 +29,16 @@ $pending_matches = (int) (q_value("SELECT COUNT(*) FROM matches WHERE status IN 
 $approved_matches = (int) (q_value("SELECT COUNT(*) FROM matches WHERE status = 'approved'") ?? 0);
 $match_rate = $total_lost > 0 ? round($approved_matches / $total_lost * 100, 1) : 0;
 
+// --- Backup status ---
+$last_backup = q_one(
+    'SELECT backup_log.created_at, accounts.full_name AS actor_name
+       FROM backup_log
+       LEFT JOIN accounts ON accounts.id = backup_log.actor_account_id
+      ORDER BY backup_log.created_at DESC
+      LIMIT 1'
+);
+$backup_count = (int) (q_value('SELECT COUNT(*) FROM backup_log') ?? 0);
+
 // --- Recent audit activity ---
 $recent_audit = q_all(
     'SELECT audit_logs.action, audit_logs.target_type, audit_logs.target_id,
@@ -156,6 +166,39 @@ page_header('Administration', '<a class="btn btn-ghost" href="' . e(url('/index.
         </a>
       </section>
     <?php endif; ?>
+
+    <!-- Backup status -->
+    <section class="card mt-4" aria-labelledby="backup-title">
+      <h2 class="card-title" id="backup-title">Database Backup</h2>
+
+      <?php if ($last_backup): ?>
+        <p class="text-sm text-muted" style="margin-bottom: var(--space-1);">
+          Last backup <?= e(time_ago((string) $last_backup['created_at'])) ?>
+          <?php if (!empty($last_backup['actor_name'])): ?>
+            by <?= e((string) $last_backup['actor_name']) ?>
+          <?php endif; ?>
+        </p>
+        <?php
+          $hours_since = (time() - strtotime((string) $last_backup['created_at'])) / 3600;
+          $status_label = $hours_since <= 24 ? 'Up to date' : ($hours_since <= 168 ? 'Getting old' : 'Overdue');
+          $status_class = $hours_since <= 24 ? 'badge-approved' : ($hours_since <= 168 ? 'badge-pending' : 'badge-rejected');
+        ?>
+        <span class="badge <?= $status_class ?>"><?= $status_label ?></span>
+        <p class="text-sm text-muted" style="margin-top: var(--space-2);">
+          <?= $backup_count ?> backup<?= $backup_count !== 1 ? 's' : '' ?> total
+        </p>
+      <?php else: ?>
+        <p class="text-sm text-muted" style="margin-bottom: var(--space-2);">No backups taken yet.</p>
+        <span class="badge badge-rejected">Never backed up</span>
+      <?php endif; ?>
+
+      <form method="POST" action="<?= e(url('/index.php?p=api.backup')) ?>" style="margin-top: var(--space-3);">
+        <?= csrf_field() ?>
+        <button type="submit" class="btn btn-ghost btn-sm" style="width: 100%; justify-content: flex-start;">
+          Download Backup Now
+        </button>
+      </form>
+    </section>
   </aside>
 
 </div>

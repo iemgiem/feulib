@@ -559,28 +559,63 @@ echo '</nav>';
 </section>
 
 <?php elseif ($tab === 'backup'):
-    $last_backup = (string) $setting('last_backup_at', '');
+    $last_backup_row = q_one(
+        'SELECT backup_log.created_at, backup_log.file_size_bytes,
+                accounts.full_name AS actor_name
+           FROM backup_log
+           LEFT JOIN accounts ON accounts.id = backup_log.actor_account_id
+          ORDER BY backup_log.created_at DESC
+          LIMIT 1'
+    );
+    $backup_count = (int) (q_value('SELECT COUNT(*) FROM backup_log') ?? 0);
+    $hours_since  = $last_backup_row
+        ? (time() - strtotime((string) $last_backup_row['created_at'])) / 3600
+        : null;
+    $status_label = $hours_since === null  ? 'Never backed up'
+        : ($hours_since <= 24  ? 'Up to date'
+        : ($hours_since <= 168 ? 'Getting old'
+        :                        'Overdue'));
+    $status_class = $hours_since === null  ? 'badge-rejected'
+        : ($hours_since <= 24  ? 'badge-approved'
+        : ($hours_since <= 168 ? 'badge-pending'
+        :                        'badge-rejected'));
 ?>
 <section class="card" aria-labelledby="backup-title">
   <h2 class="card-title" id="backup-title">Backup status</h2>
   <p class="card-subtitle">
-    Timestamp of the last automatic MySQL backup, written by the scheduled
-    backup job.
+    Download a full SQL dump of the database. Each download is logged below.
   </p>
+
   <dl class="detail-grid">
+    <dt>Status</dt>
+    <dd><span class="badge <?= $status_class ?>"><?= e($status_label) ?></span></dd>
+
     <dt>Last backup</dt>
     <dd>
-      <?php if ($last_backup !== ''): ?>
-        <?= e(date('F j, Y g:i A', strtotime($last_backup))) ?>
+      <?php if ($last_backup_row): ?>
+        <?= e(date('F j, Y g:i A', strtotime((string) $last_backup_row['created_at']))) ?>
+        (<?= e(time_ago((string) $last_backup_row['created_at'])) ?>)
+        <?php if (!empty($last_backup_row['actor_name'])): ?>
+          &mdash; by <?= e((string) $last_backup_row['actor_name']) ?>
+        <?php endif; ?>
+        <?php if (!empty($last_backup_row['file_size_bytes'])): ?>
+          <span class="text-muted text-sm">
+            &middot; <?= e(number_format((int) $last_backup_row['file_size_bytes'] / 1024, 1)) ?> KB
+          </span>
+        <?php endif; ?>
       <?php else: ?>
-        <span class="text-muted">No automatic backup has been recorded yet.</span>
+        <span class="text-muted">No backups taken yet.</span>
       <?php endif; ?>
     </dd>
+
+    <dt>Total backups</dt>
+    <dd><?= $backup_count ?></dd>
   </dl>
-  <p class="text-sm text-muted">
-    The backup procedure itself is part of operations setup (project roadmap §4).
-    This panel reads the <code>last_backup_at</code> setting.
-  </p>
+
+  <form method="POST" action="<?= e(url('/index.php?p=api.backup')) ?>" style="margin-top: var(--space-4);">
+    <?= csrf_field() ?>
+    <button type="submit" class="btn btn-primary">Download Backup Now</button>
+  </form>
 </section>
 
 <?php elseif ($tab === 'users'):

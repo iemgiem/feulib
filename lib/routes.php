@@ -81,4 +81,7 @@ return [
     // Mock ITS endpoint — public because external APIs authenticate via
     // header, not session. The handler validates the configured token.
     'api.its_mock'      => ['file' => 'api.its_mock.php',      'public' => true],
+
+    // Admin-only backup download — generates a full SQL dump on demand.
+    'api.backup'        => ['file' => 'api.backup.php',        'roles' => ['admin']],
 ];

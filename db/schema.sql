@@ -17,6 +17,7 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS backup_log;
 DROP TABLE IF EXISTS audit_logs;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS release_logs;
@@ -314,6 +315,22 @@ CREATE TABLE audit_logs (
   KEY idx_audit_created (created_at),
   CONSTRAINT fk_audit_actor
     FOREIGN KEY (actor_account_id) REFERENCES accounts(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- backup_log — record of every admin-triggered database backup.
+-- actor_account_id is nullable for future scheduled/cron backup runs.
+-- -----------------------------------------------------------------------------
+CREATE TABLE backup_log (
+  id                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  actor_account_id  INT UNSIGNED  NULL,
+  file_size_bytes   INT UNSIGNED  NULL,
+  created_at        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_backup_log_created (created_at),
+  CONSTRAINT fk_backup_log_actor
+    FOREIGN KEY (actor_account_id) REFERENCES accounts (id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
